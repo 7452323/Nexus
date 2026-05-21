@@ -18,7 +18,7 @@
 摘要内容示例：
 ```
 📎 记忆摘要:
-- 最近项目: 书源编写(七猫/xbookcn)、openclaw-patches 仓库
+- 最近项目: 书源编写(七猫/xbookcn)、Nexus/openclaw 仓库
 - 主人: 爸爸(微信)，服务器: racknerd (Debian 12)
 - 常用: python3 / node / git / curl
 - Key: DeepSeek 主力，余额约 ¥300
