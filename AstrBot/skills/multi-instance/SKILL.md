@@ -1,64 +1,64 @@
-# Multi Instance
+# 多实例管理 (Multi Instance)
 
-## Description
-Manages multiple independent AstrBot configuration instances on the same machine. Enables running separate environments for development, production, and testing with isolated configurations.
+## 描述
+在同一台机器上管理多个独立的 AstrBot 配置实例。支持运行开发、生产、测试等独立环境，每个环境拥有隔离的配置。
 
-## Instructions
+## 指令
 
-### Instance Directory Structure
+### 实例目录结构
 
 ```
 instances/
-├── default/    # Default instance (daily use)
-├── dev/        # Development instance (test new features)
-└── prod/       # Production instance (stable operation)
+├── default/    # 默认实例（日常使用）
+├── dev/        # 开发实例（测试新功能）
+└── prod/       # 生产实例（稳定运行）
 ```
 
-Each instance contains its own complete configuration files.
+每个实例包含自己完整的配置文件。
 
-### Command Reference
+### 命令参考
 
-| User says | Effect |
+| 用户说 | 效果 |
 |-----------|--------|
-| "switch instance dev" | Switch to development instance (restart required) |
-| "create instance test" | Create new instance by copying default config |
-| "delete instance test" | Delete test instance (requires confirmation) |
-| "list instances" | Show all instances and their status |
+| "切换实例 dev" | 切换到开发实例（需要重启） |
+| "创建实例 test" | 通过复制默认配置创建新实例 |
+| "删除实例 test" | 删除测试实例（需要确认） |
+| "列出实例" | 显示所有实例及其状态 |
 
-### Checklist
+### 检查清单
 
-Before switching:
-- [ ] Target instance configuration exists
-- [ ] Target port/working directory is not occupied
-- [ ] No ongoing tasks that would be disrupted
+切换前：
+- [ ] 目标实例配置存在
+- [ ] 目标端口/工作目录未被占用
+- [ ] 没有会受影响的中断中的任务
 
-When creating:
-- [ ] Instance name doesn't already exist
-- [ ] Port/working directory not used by other instances
+创建时：
+- [ ] 实例名称不存在
+- [ ] 端口/工作目录未被其他实例使用
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| action | string | Yes | "list", "switch", "create", "delete" |
-| instance_name | string | For switch/create/delete | Name of the instance |
-| source_instance | string | For create only | Instance to copy from (default: "default") |
+| action | string | 是 | "list", "switch", "create", "delete" |
+| instance_name | string | switch/create/delete 时必填 | 实例名称 |
+| source_instance | string | 仅 create 时 | 要复制的来源实例（默认: "default"） |
 
-## Examples
-
-```
-User: "list instances"
-Agent: Shows all instances with their status → "default (running), dev (stopped), prod (running)"
-```
+## 示例
 
 ```
-User: "switch to dev instance"
-Agent: Verify dev instance exists → check if port is free → suggest restart → "Ready to switch. Restart to apply."
+用户："列出实例"
+智能体：显示所有实例及其状态 → "default (运行中), dev (已停止), prod (运行中)"
 ```
 
-## Notes
-- Creating an instance copies the default instance's configuration
-- Deleting requires explicit user confirmation with "yes"
-- Instance changes typically require a service restart to take effect
-- Ports and working directories must be unique per instance
-- Each instance maintains its own memory and conversation history
+```
+用户："切换到 dev 实例"
+智能体：验证 dev 实例存在 → 检查端口是否空闲 → 建议重启 → "可以切换，重启后生效。"
+```
+
+## 备注
+- 创建实例时复制默认实例的配置
+- 删除需要用户明确输入 "yes" 确认
+- 实例变更通常需要重启服务才能生效
+- 每个实例的端口和工作目录必须唯一
+- 每个实例维护自己的记忆和对话历史

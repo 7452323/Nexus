@@ -1,84 +1,84 @@
-# Daily Digest
+# 每日摘要 (Daily Digest)
 
-## Description
-Generates and delivers a daily operational report. Includes API usage statistics, key inventory, server health metrics, and activity summary. Can be triggered manually or run automatically on a schedule.
+## 描述
+生成并投递每日运营报告。包含 API 使用统计、密钥库存、服务器健康指标和活动摘要。可手动触发或按计划自动运行。
 
-## Instructions
+## 指令
 
-### Report Content
+### 报告内容
 
 ```
-📊 Daily Report - YYYY-MM-DD
+📊 每日报告 - YYYY-MM-DD
 ━━━━━━━━━━━━━━━━━━━━━
 
-💰 API Costs
-  Primary Model: $0.30
-  Secondary Model: $0.05
-  Total: $0.35
+💰 API 费用
+  主模型：$0.30
+  备用模型：$0.05
+  总计：$0.35
 
-🔑 Key Inventory
-  Provider A: 6 valid (Balance $274.24)
-  Provider B: 3 (Free)
-  Provider C: 1 (Free)
+🔑 密钥库存
+  提供商 A：6个有效（余额 $274.24）
+  提供商 B：3个（免费）
+  提供商 C：1个（免费）
 
-🖥️ Server Health
-  CPU: 45%
-  Memory: 2.0/2.4 GB (83%)
-  Disk: 20/39 GB (51%)
-  Uptime: 15 days
+🖥️ 服务器健康
+  CPU：45%
+  内存：2.0/2.4 GB (83%)
+  磁盘：20/39 GB (51%)
+  运行时间：15天
 
-📝 Yesterday's Activity
-  Sessions: 12
-  Tool Calls: 47
-  Memory Updates: 3
+📝 昨日活动
+  会话数：12
+  工具调用：47
+  记忆更新：3
 ━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Configuration
+### 配置
 
-| Config Item | Default | Description |
+| 配置项 | 默认值 | 描述 |
 |-------------|---------|-------------|
-| push_time | 07:30 | Auto-send time daily |
-| include_costs | true | Include API cost statistics |
-| include_health | true | Include server status |
-| include_activity | true | Include yesterday's activity |
+| push_time | 07:30 | 每日自动发送时间 |
+| include_costs | true | 包含 API 费用统计 |
+| include_health | true | 包含服务器状态 |
+| include_activity | true | 包含昨日活动 |
 
-### Implementation Steps
+### 实施步骤
 
-1. **Collect API cost data** — Query API usage logs for yesterday
-2. **Check key inventory** — Verify remaining valid API keys and balances
-3. **Gather server metrics** — CPU, memory, disk, uptime
-4. **Count activity** — Sessions, tool calls, memory update counts
-5. **Format report** — Use the template above
-6. **Deliver** — Send to configured notification channel
+1. **收集 API 费用数据** — 查询昨日 API 使用日志
+2. **检查密钥库存** — 验证剩余有效 API 密钥和余额
+3. **收集服务器指标** — CPU、内存、磁盘、运行时间
+4. **统计活动量** — 会话数、工具调用数、记忆更新数
+5. **格式化报告** — 使用上方模板
+6. **投递** — 发送到配置的通知通道
 
-### Trigger Methods
+### 触发方式
 
-- **Scheduled:** Runs automatically at configured push time
-- **Manual:** User says "daily report", "today's report", "digest"
+- **定时：** 在配置的推送时间自动运行
+- **手动：** 用户说"每日报告"、"今天的报告"、"摘要"
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| date | string | No | Specific date for report (default: today) |
-| channel | string | No | Delivery channel (default: current chat) |
+| date | string | 否 | 指定报告日期（默认: 今天） |
+| channel | string | 否 | 投递通道（默认: 当前聊天） |
 
-## Examples
-
-```
-User: "daily report"
-Agent: Generates and displays the full daily digest with costs, health, and activity.
-```
+## 示例
 
 ```
-User: "how was yesterday's usage?"
-Agent: Shows only the activity and cost sections of the daily report.
+用户："每日报告"
+智能体：生成并显示完整的每日摘要，包含费用、健康和活动。
 ```
 
-## Notes
-- Manual trigger can be used at any time
-- Cost data availability depends on provider API support
-- Server health requires system-level access (ssh, /proc, df)
-- Reports are generated fresh each time, not cached
-- Summarize long reports if delivering to chat platforms
+```
+用户："昨天的用量怎么样？"
+智能体：只显示每日报告中的活动和费用部分。
+```
+
+## 备注
+- 可随时手动触发
+- 费用数据可用性取决于提供商 API 支持
+- 服务器健康需要系统级访问（ssh, /proc, df）
+- 报告每次重新生成，不缓存
+- 投递到聊天平台时摘要过长内容

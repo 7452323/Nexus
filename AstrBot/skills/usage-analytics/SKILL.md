@@ -1,75 +1,75 @@
-# Usage Analytics
+# 使用分析 (Usage Analytics)
 
-## Description
-Collects and analyzes agent usage data to understand operational patterns. Tracks session statistics, tool call frequency, API costs, and activity trends. Generates reports on demand.
+## 描述
+收集和分析智能体的使用数据，了解运行模式。跟踪会话统计、工具调用频率、API 费用和活动趋势。按需生成报告。
 
-## Instructions
+## 指令
 
-### Statistics Collected
+### 统计数据收集
 
 ```
-Session Stats:
-  Daily session count         → Usage activity level
-  Average session duration    → Task complexity indicator
-  Peak activity hours         → Optimize scheduled tasks
-  Session source distribution → Channel/platform breakdown
+会话统计：
+  每日会话数         → 使用活跃度
+  平均会话时长       → 任务复杂度指标
+  高峰活动时段       → 优化定时任务
+  会话来源分布       → 通道/平台分布
 
-Tool Call Stats:
-  Daily tool call count       → Workload measurement
-  Top 10 most used tools      → High-frequency functions
-  Tool call success rate      → Anomaly and error detection
-  Average response time       → Performance baseline
+工具调用统计：
+  每日工具调用数     → 工作负载度量
+  最常用TOP 10工具   → 高频功能
+  工具调用成功率     → 异常和错误检测
+  平均响应时间       → 性能基线
 
-Cost Analysis:
-  Daily API costs             → Cost control
-  Model usage distribution    → Model selection optimization
-  Estimated monthly cost      → Budget planning
-  7-day cost trend            → Anomaly detection
+费用分析：
+  每日 API 费用      → 成本控制
+  模型使用分布       → 模型选择优化
+  预估月度费用       → 预算规划
+  7天费用趋势        → 异常检测
 ```
 
-### Query Commands
+### 查询命令
 
-| User says | Result |
+| 用户说 | 结果 |
 |-----------|--------|
-| "usage stats" | Show today's statistics |
-| "this month's costs" | Show API cost summary for this month |
-| "most used tools" | Show tool call frequency ranking |
-| "peak hours" | Show session distribution by hour |
-| "7 day trend" | Show last 7 days cost trend |
-| "weekly report" | Generate complete weekly analytics |
+| "使用统计" | 显示今日统计 |
+| "这个月的费用" | 显示本月 API 费用汇总 |
+| "最常用的工具" | 显示工具调用频率排名 |
+| "高峰时段" | 显示按小时的会话分布 |
+| "7天趋势" | 显示最近7天的费用趋势 |
+| "周报" | 生成完整的每周分析 |
 
-### Implementation Steps
+### 实施步骤
 
-1. **Session tracking** — Count sessions per day, track source and duration
-2. **Tool monitoring** — Log each tool call with name, duration, success/failure
-3. **Cost logging** — Record API provider costs per request (when available)
-4. **Report generation** — Aggregate data, format for delivery
-5. **Storage** — Save analytics to `logs/analytics/` directory, one file per day
+1. **会话跟踪** — 统计每天会话数，跟踪来源和时长
+2. **工具监控** — 记录每次工具调用的名称、时长、成功/失败
+3. **费用记录** — 记录每次请求的 API 提供商费用（如果有）
+4. **报告生成** — 汇总数据，格式化投递
+5. **存储** — 分析数据保存到 `logs/analytics/` 目录，每天一个文件
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| report_type | string | Yes | "daily", "weekly", "monthly", "cost", "tools", "sessions" |
-| date_range | string | No | Date range (e.g., "7d", "30d", "2026-05-01..2026-05-21") |
+| report_type | string | 是 | "daily", "weekly", "monthly", "cost", "tools", "sessions" |
+| date_range | string | 否 | 日期范围（如 "7d", "30d", "2026-05-01..2026-05-21"） |
 
-## Examples
-
-```
-User: "usage stats"
-Agent: Shows today's stats → "Today: 12 sessions, 47 tool calls (92% success rate), $0.35 API cost"
-```
+## 示例
 
 ```
-User: "7 day cost trend"
-Agent: Aggregates last 7 days → "Mon: $0.30, Tue: $0.45, Wed: $0.22, Thu: $0.35, Fri: $0.50, Sat: $0.15, Sun: $0.28"
+用户："使用统计"
+智能体：显示今日统计 → "今日：12个会话，47次工具调用（92%成功率），API费用 $0.35"
 ```
 
-## Notes
-- Analytics data is stored locally in `logs/analytics/` directory
-- Cost data availability depends on API provider's response
-- Session tracking requires minimal overhead per interaction
-- Data is not sent to any external analytics service
-- Old analytics files should be rotated (keep last 90 days)
-- Tool call success rate helps identify frequently failing operations
-- Peak hour analysis helps schedule resource-intensive tasks
+```
+用户："7天费用趋势"
+智能体：汇总最近7天 → "周一：$0.30, 周二：$0.45, 周三：$0.22, 周四：$0.35, 周五：$0.50, 周六：$0.15, 周日：$0.28"
+```
+
+## 备注
+- 分析数据本地存储在 `logs/analytics/` 目录
+- 费用数据可用性取决于 API 提供商的响应
+- 会话跟踪每次交互开销极小
+- 数据不会发送到任何外部分析服务
+- 旧分析文件应轮转（保留最近90天）
+- 工具调用成功率有助于识别频繁失败的操作
+- 高峰时段分析有助于安排资源密集型任务

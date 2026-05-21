@@ -1,76 +1,76 @@
-# Notification Bridge
+# 通知桥 (Notification Bridge)
 
-## Description
-Pushes agent operation results and alerts to multiple notification channels. Supports delivering messages to the current conversation, webhook endpoints, and other configurable channels. Handles priority-based routing.
+## 描述
+将智能体的操作结果和警报推送到多个通知通道。支持向当前对话、webhook 端点和其他可配置通道传递消息。处理基于优先级的消息路由。
 
-## Instructions
+## 指令
 
-### Supported Channels
+### 支持的通道
 
-| Channel | Configuration Needed | Use Case |
+| 通道 | 所需配置 | 使用场景 |
 |---------|---------------------|----------|
-| Current chat | None needed | Default notification channel |
-| Webhook URL | Webhook endpoint URL | External service integration |
-| Email (SMTP) | SMTP server config | Important alerts |
+| 当前聊天 | 无需配置 | 默认通知通道 |
+| Webhook URL | Webhook 端点 URL | 外部服务集成 |
+| 邮件 (SMTP) | SMTP 服务器配置 | 重要警报 |
 
-### Notification Priority Levels
+### 通知优先级级别
 
-| Level | Trigger Condition | Channels |
+| 级别 | 触发条件 | 通道 |
 |-------|------------------|----------|
-| P0 Critical | Service down, resource critical | Current chat + webhook |
-| P1 Important | Daily report, task completion | Current chat |
-| P2 Normal | Task progress, status updates | Current chat only |
+| P0 紧急 | 服务宕机、资源严重告警 | 当前聊天 + webhook |
+| P1 重要 | 每日报告、任务完成 | 当前聊天 |
+| P2 普通 | 任务进度、状态更新 | 仅当前聊天 |
 
-### Notification Format
+### 通知格式
 
 ```
-[Bot] [Level] Title
+[智能体] [级别] 标题
 
-Message content
+消息内容
 
-Time: YYYY-MM-DD HH:MM
-Source: Task/Session name
+时间：YYYY-MM-DD HH:MM
+来源：任务/会话名称
 ```
 
-### Implementation Steps
+### 实施步骤
 
-1. Detect notification trigger (P0/P1 conditions, or manual)
-2. Format message according to template
-3. Deliver to primary channel (current chat)
-4. If P0, also deliver to secondary channels (webhook)
-5. Log delivery status
+1. 检测通知触发（P0/P1 条件满足，或手动触发）
+2. 按模板格式化消息
+3. 发送到主要通道（当前聊天）
+4. 如果是 P0，也发送到次要通道（webhook）
+5. 记录投递状态
 
-### Trigger Methods
+### 触发方式
 
-- **Auto:** P0/P1 conditions met automatically
-- **Manual:** User says "notify me [content]", "send to [channel]"
+- **自动：** P0/P1 条件自动满足时触发
+- **手动：** 用户说"通知我 [内容]"、"发送到 [通道]"
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| title | string | Yes | Notification title |
-| message | string | Yes | Notification content |
-| level | string | Yes | "P0", "P1", or "P2" |
-| channel | string | No | Override delivery channel |
-| source | string | No | Source identifier (task/session name) |
+| title | string | 是 | 通知标题 |
+| message | string | 是 | 通知内容 |
+| level | string | 是 | "P0", "P1" 或 "P2" |
+| channel | string | 否 | 覆盖投递通道 |
+| source | string | 否 | 来源标识（任务/会话名称） |
 
-## Examples
-
-```
-User: "notify me when the task completes"
-Agent: Sets up monitoring → when task done, sends notification with result.
-```
+## 示例
 
 ```
-User (after alert): "send to webhook"
-Agent: Resends last notification to configured webhook endpoint.
+用户："任务完成时通知我"
+智能体：设置监控 → 任务完成时，发送带有结果的通知。
 ```
 
-## Notes
-- Current chat is always the default notification channel
-- P0 alerts are delivered to all configured channels
-- Respect user's quiet hours — avoid P2 notifications at night
-- Webhook delivery uses HTTP POST with JSON payload
-- Failed delivery to secondary channels should be logged but not retried
-- Does not store or manage credentials — use environment variables for tokens
+```
+用户（收到警报后）："发送到 webhook"
+智能体：将上一条通知重新发送到配置的 webhook 端点。
+```
+
+## 备注
+- 当前聊天始终是默认通知通道
+- P0 警报投递到所有已配置的通道
+- 遵守用户的免打扰时间——夜间避免 P2 通知
+- Webhook 投递使用 HTTP POST 和 JSON payload
+- 次要通道投递失败应记录但不重试
+- 不存储或管理凭证——使用环境变量管理 token

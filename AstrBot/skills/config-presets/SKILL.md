@@ -1,82 +1,82 @@
-# Config Presets
+# 配置预设 (Config Presets)
 
-## Description
-Manages configuration profile switching for the AstrBot agent. Allows switching between different performance modes (high-performance, balanced, power-saving, development) with a single command. Optimizes resource usage based on the current task type.
+## 描述
+管理 AstrBot 智能体的配置方案切换。支持单命令切换不同性能模式（高性能、均衡、省电、开发）。根据当前任务类型优化资源使用。
 
-## Instructions
+## 指令
 
-### Available Presets
+### 可用预设
 
-#### High-Performance Mode
+#### 高性能模式
 ```
-Use: Code writing, deep analysis, large project refactoring
-Model: Best available reasoning model
-Concurrency: 4
-Timeout: 120 seconds
-```
-
-#### Balanced Mode (Default)
-```
-Use: Daily conversation, normal tasks
-Model: Fast default model
-Concurrency: 2
-Timeout: 60 seconds
+用途：代码编写、深度分析、大型项目重构
+模型：最佳可用的推理模型
+并发：4
+超时：120秒
 ```
 
-#### Power-Saving Mode
+#### 均衡模式（默认）
 ```
-Use: Simple chat, quick lookups
-Model: Fastest response model
-Concurrency: 1
-Timeout: 30 seconds
-```
-
-#### Development Mode
-```
-Use: Debugging scripts, testing new features
-Model: Fast default model
-Log Level: DEBUG
+用途：日常对话、常规任务
+模型：快速默认模型
+并发：2
+超时：60秒
 ```
 
-### Switching Commands
+#### 省电模式
+```
+用途：简单聊天、快速查询
+模型：响应最快的模型
+并发：1
+超时：30秒
+```
 
-| User says | Effect |
+#### 开发模式
+```
+用途：调试脚本、测试新功能
+模型：快速默认模型
+日志级别：DEBUG
+```
+
+### 切换命令
+
+| 用户说 | 效果 |
 |-----------|--------|
-| "high performance mode" | Switch to high-performance preset |
-| "power saving mode" | Switch to power-saving |
-| "balanced mode" / "default" | Return to default |
-| "development mode" | Development mode (more logging) |
+| "高性能模式" | 切换到高性能预设 |
+| "省电模式" | 切换到省电预设 |
+| "均衡模式" / "默认" | 返回默认模式 |
+| "开发模式" | 开发模式（更多日志） |
 
-### Implementation Steps
+### 实施步骤
 
-1. When user requests a mode switch, acknowledge the request
-2. Adjust conversation parameters:
-   - High-performance: Use slower, more powerful model for reasoning-heavy tasks
-   - Power-saving: Be concise, skip analysis, prefer cached/quick answers
-   - Balanced: Normal operation
-   - Development: Enable verbose logging, step-by-step debugging
-3. Confirm the mode switch is complete
+1. 当用户请求切换模式时，确认请求
+2. 调整对话参数：
+   - 高性能：对推理密集型任务使用更慢但更强的模型
+   - 省电：回复简洁，跳过分析，优先使用缓存/快速回答
+   - 均衡：正常操作
+   - 开发：启用详细日志，逐步调试
+3. 确认模式切换完成
 
-## Parameters
+## 参数
 
-| Parameter | Type | Description |
+| 参数名 | 类型 | 描述 |
 |-----------|------|-------------|
-| mode | string | One of: "high-performance", "balanced", "power-saving", "development" |
+| mode | string | 可选值："high-performance", "balanced", "power-saving", "development" |
 
-## Examples
-
-```
-User: "high performance mode"
-Agent: "Switched to High-Performance Mode. Using best model for reasoning. Ready for complex analysis tasks."
-```
+## 示例
 
 ```
-User: "power saving mode"
-Agent: "Switched to Power-Saving Mode. Responses will be concise and prioritized for speed."
+用户："高性能模式"
+智能体："已切换到高性能模式。使用最佳模型进行推理。准备处理复杂分析任务。"
 ```
 
-## Notes
-- Default mode is "balanced" for most interactions
-- High-performance mode may consume more API credits
-- Power-saving mode limits analysis depth but responds faster
-- Mode persists for the current session unless changed
+```
+用户："省电模式"
+智能体："已切换到省电模式。回复将简洁优先，以速度为主。"
+```
+
+## 备注
+- 默认为"均衡"模式，适用于大多数交互
+- 高性能模式可能消耗更多 API 额度
+- 省电模式限制分析深度但响应更快
+- 模式在当前会话中持续生效，除非更改
