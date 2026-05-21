@@ -1,71 +1,71 @@
-# Preflight Checker
+# 前置安全检查器 (Preflight Checker)
 
-## Description
-Safety validation layer that checks tool call parameters before execution. Intercepts dangerous operations (file deletion, system commands, database destruction), warns about risky actions, and suggests safer alternatives.
+## 描述
+安全验证层，在工具调用参数执行前进行检查。拦截危险操作（文件删除、系统命令、数据库销毁），警告风险操作，并建议更安全的替代方案。
 
-## Instructions
+## 指令
 
-### Checks for Shell Commands
+### Shell 命令检查
 
-| Pattern | Action | Alternative |
+| 模式 | 操作 | 替代方案 |
 |---------|--------|-------------|
-| `rm -rf /`, `rm -rf /*`, `rm -r /` | 🚫 Block | Use specific path, not root |
-| `mkfs.`, `dd if=`, `chmod -R 000` | 🚫 Block | Confirm target device and path |
-| `git push --force` | ⚠️ Warn | Use `git push --force-with-lease` |
-| `git reset --hard HEAD~` | ⚠️ Warn | Backup or stash first |
-| `DROP TABLE`, `DROP DATABASE` | ⚠️ Warn | Confirm table name first |
-| `:(){ :|:& };:` (fork bomb) | 🚫 Block | No alternative |
+| `rm -rf /`, `rm -rf /*`, `rm -r /` | 🚫 阻止 | 使用具体路径，不要用根目录 |
+| `mkfs.`, `dd if=`, `chmod -R 000` | 🚫 阻止 | 确认目标设备和路径 |
+| `git push --force` | ⚠️ 警告 | 使用 `git push --force-with-lease` |
+| `git reset --hard HEAD~` | ⚠️ 警告 | 先备份或 stash |
+| `DROP TABLE`, `DROP DATABASE` | ⚠️ 警告 | 先确认表名 |
+| `:(){ :|:& };:`（fork bomb） | 🚫 阻止 | 无替代方案 |
 
-### Checks for File Operations
+### 文件操作检查
 
-| Path Pattern | Action |
+| 路径模式 | 操作 |
 |-------------|--------|
-| `/etc/shadow`, `/etc/sudoers` | 🚫 Block |
-| `/etc/ssh/` any file | 🚫 Block |
-| Private key files in `~/.ssh/` | 🚫 Block |
-| Config files in `~/.config/` | ⚠️ Require confirmation |
+| `/etc/shadow`, `/etc/sudoers` | 🚫 阻止 |
+| `/etc/ssh/` 下任何文件 | 🚫 阻止 |
+| `~/.ssh/` 下的私钥文件 | 🚫 阻止 |
+| `~/.config/` 下的配置文件 | ⚠️ 需要确认 |
 
-### Checks for URLs / Network Requests
+### URL / 网络请求检查
 
-| Pattern | Action |
+| 模式 | 操作 |
 |---------|--------|
-| URL points to internal IP (127., 10., 192.168., 172.16-31.) | ⚠️ Warn |
-| URL contains `ghp_`, `sk-`, `AIzaSy`, `token=` in plaintext | ⚠️ Warn credential leak |
+| URL 指向内网 IP（127., 10., 192.168., 172.16-31.） | ⚠️ 警告 |
+| URL 明文包含 `ghp_`, `sk-`, `AIzaSy`, `token=` | ⚠️ 警告凭证泄露 |
 
-### Execution Flow
+### 执行流程
 
 ```
-Receive tool call → Parse tool name + parameters → Match against rules
-  ├─ ✅ Pass → Execute normally
-  ├─ ⚠️ Warn → Execute + print warning
-  └─ 🚫 Block → Reject + explain reason + suggest alternative
+收到工具调用 → 解析工具名 + 参数 → 匹配规则
+  ├─ ✅ 通过 → 正常执行
+  ├─ ⚠️ 警告 → 执行 + 打印警告
+  └─ 🚫 阻止 → 拒绝 + 解释原因 + 建议替代方案
 ```
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| command | string | For exec | Shell command to validate |
-| path | string | For file ops | File path to validate |
-| url | string | For network | URL to validate |
-| strict_mode | boolean | No | Enable all blocks as errors (default: false) |
+| command | string | exec 时必填 | 要验证的 shell 命令 |
+| path | string | 文件操作时必填 | 要验证的文件路径 |
+| url | string | 网络请求时必填 | 要验证的 URL |
+| strict_mode | boolean | 否 | 将所有拦截视为错误（默认: false） |
 
-## Examples
-
-```
-User suggestion: "rm -rf /var/logs"
-Agent: (Checks: pattern matches safe path) → "✅ Safe. Proceeding with deletion of /var/logs only."
-```
+## 示例
 
 ```
-User suggestion: "rm -rf /"
-Agent: (Check: matches root deletion) → "🚫 Blocked. Use 'trash' or specify exact path like 'rm -rf /tmp/target' instead."
+用户建议："rm -rf /var/logs"
+智能体：（检查：路径匹配安全路径）→ "✅ 安全。只删除 /var/logs 目录。"
 ```
 
-## Notes
-- Never execute rm -rf on root or system directories without explicit, confirmed user intent
-- Warn about any git destructive operations before execution
-- Block fork bombs and system-destroying commands entirely
-- Credential leak detection is best-effort — not a replacement for secure practices
-- When uncertain about safety, ask for user confirmation
-- File path checks check for containment in protected directories, not just equality
+```
+用户建议："rm -rf /"
+智能体：（检查：匹配根目录删除）→ "🚫 已阻止。请使用 'trash' 或指定具体路径，如 'rm -rf /tmp/target'。"
+```
+
+## 备注
+- 未经用户明确确认，绝不执行对根目录或系统目录的 rm -rf
+- 任何破坏性 git 操作，执行前发出警告
+- 完全阻止 fork bomb 和系统破坏命令
+- 凭证泄露检测尽力而为——不能替代安全实践
+- 不确定安全性时，请求用户确认
+- 文件路径检查检查是否**包含在**受保护目录中，不仅是精确匹配

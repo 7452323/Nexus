@@ -1,82 +1,82 @@
-# Memory Enhancer
+# 记忆增强器 (Memory Enhancer)
 
-## Description
-Enhances the agent's memory system by automatically scanning memory files at session start, expanding user queries with related search terms, and recalling relevant past context before responding. Solves the "new session doesn't remember previous context" problem.
+## 描述
+自动增强智能体的记忆系统：在会话启动时扫描记忆文件，用相关搜索词扩展用户查询，并在回复前回忆相关上下文。解决"新会话不记得之前上下文"的问题。
 
-## Instructions
+## 指令
 
-### 1. Memory Indexing — Session Start Trigger
+### 1. 记忆索引 — 会话启动触发
 
-At the start of every new session:
+在每个新会话开始时：
 
 ```
-Step 1: Scan memory/*.md for last 7 days
-Step 2: Extract recent projects (repo names, commands, config changes)
-Step 3: Scan MEMORY.md for long-term memory summary
-Step 4: Inject summary into session context (~200 words)
+第1步：扫描 memory/*.md 最近7天的文件
+第2步：提取近期项目（仓库名、命令、配置变更）
+第3步：扫描 MEMORY.md 获取长期记忆摘要
+第4步：将摘要注入会话上下文（约200字）
 ```
 
-Summary example:
+摘要示例：
 ```
-📎 Memory Summary:
-- Recent projects: [project names]
-- Key users: [users]
-- Common tools: python3 / node / git / curl
-- Active configs: [API providers and balances]
+📎 记忆摘要：
+- 近期项目：[项目名称]
+- 关键用户：[用户]
+- 常用工具：python3 / node / git / curl
+- 活跃配置：[API 提供商和余额]
 ```
 
-### 2. Query Expansion — User Question Trigger
+### 2. 查询扩展 — 用户提问触发
 
-When user asks a question, expand into multiple search terms:
+当用户提问时，扩展为多个搜索词：
 
-| User says | Expanded search |
+| 用户说 | 扩展搜索 |
 |-----------|-----------------|
-| "send a file" | `sendDocument`, `curl`, `telegram`, `file-delivery` |
-| "config / change config" | `config.json`, `configuration`, `settings` |
-| "error / bug" | `error`, `bug`, `fix`, `workaround`, `log` |
-| "restart" | `restart`, `service`, `systemctl` |
-| "delete" | `delete`, `backup`, `safety`, `trash` |
-| "key / token / API key" | `key`, `api key`, `credential`, `auth` |
-| "update / upgrade" | `update`, `upgrade`, `git pull`, `version` |
+| "发个文件" | `sendDocument`, `curl`, `telegram`, `file-delivery` |
+| "配置 / 改配置" | `config.json`, `configuration`, `settings` |
+| "报错 / bug" | `error`, `bug`, `fix`, `workaround`, `log` |
+| "重启" | `restart`, `service`, `systemctl` |
+| "删除" | `delete`, `backup`, `safety`, `trash` |
+| "密钥 / token / API 密钥" | `key`, `api key`, `credential`, `auth` |
+| "更新 / 升级" | `update`, `upgrade`, `git pull`, `version` |
 
-### 3. Recall Before Reply — Pre-response Trigger
+### 3. 回复前回忆 — 响应前触发
 
 ```
-1. Extract entities from user message (project names, file names, command names)
-2. Perform memory_search for each entity (threshold ≥ 0.6)
-3. Hits ≥ 0.85: Directly reference in response
-4. Hits 0.6-0.84: Append "📎 Related memory:" reminder block
+1. 从用户消息中提取实体（项目名、文件名、命令名）
+2. 对每个实体执行 memory_search（阈值 ≥ 0.6）
+3. 命中 ≥ 0.85：在回复中直接引用
+4. 命中 0.6-0.84：追加 "📎 相关记忆：" 提醒块
 ```
 
-### Constraints
+### 约束
 
-- Memory summary injection: ≤200 characters
-- Search threshold minimum: 0.6
-- Format recalled memories as quoted blocks
+- 记忆摘要注入：≤200 字符
+- 搜索阈值最低：0.6
+- 回忆到的记忆格式化为引用块
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| search_threshold | number | No | Memory search relevance threshold (0.0-1.0, default: 0.6) |
-| max_summary_length | number | No | Max chars for context injection summary (default: 200) |
-| recent_days | number | No | Days of memory to scan at session start (default: 7) |
+| search_threshold | number | 否 | 记忆搜索相关度阈值 (0.0-1.0，默认: 0.6) |
+| max_summary_length | number | 否 | 上下文注入摘要的最大字符数 (默认: 200) |
+| recent_days | number | 否 | 会话启动时扫描的天数 (默认: 7) |
 
-## Examples
-
-```
-User: (New session) "What was that project we worked on last week?"
-Agent: (Scans memory → finds project) "We worked on the Nexus repository converting OpenClaw skills to AstrBot format."
-```
+## 示例
 
 ```
-User: "Error when running that script"
-Agent: (Expands: error, bug, fix, log) → (Finds memory about the script + fix) → "I see you had an issue with script X. The fix was Y."
+用户：（新会话）"上周我们做的那个项目是什么来着？"
+智能体：（扫描记忆 → 找到项目）"我们做了 Nexus 仓库，把 OpenClaw 技能转换成 AstrBot 格式。"
 ```
 
-## Notes
-- Run memory indexing at the START of each new session
-- Query expansion helps find relevant memories even with vague queries
-- Pre-response recall prevents repeating past mistakes
-- Do not inject memory summary into context every message — only at session start
-- Respect memory isolation rules for multi-channel contexts
+```
+用户："跑那个脚本报错了"
+智能体：（扩展：error, bug, fix, log）→（找到该脚本的记忆 + 修复方案）→"我看到你之前遇到过脚本 X 的问题，修复方法是 Y。"
+```
+
+## 备注
+- 在每个新会话**启动时**运行记忆索引
+- 查询扩展有助于在模糊查询下也能找到相关记忆
+- 回复前回忆可避免重复过去的错误
+- 不要每条消息都注入记忆摘要——仅在会话启动时做一次
+- 对多通道上下文遵守记忆隔离规则

@@ -1,77 +1,77 @@
-# Memory Backup Auto
+# 自动记忆备份 (Memory Backup Auto)
 
-## Description
-Automatically creates timestamped backups of memory files, configuration, and critical workspace data. Retains multiple version snapshots with configurable retention policies. Supports rollback to restore from any saved snapshot.
+## 描述
+自动创建带时间戳的记忆文件、配置和关键工作区数据的备份。保留多个版本快照，支持可配置的保留策略。可从任何保存的快照回滚恢复。
 
-## Instructions
+## 指令
 
-### Backup Strategy
+### 备份策略
 
-| Snapshot Type | Retention Count | Trigger |
+| 快照类型 | 保留数量 | 触发条件 |
 |---------------|-----------------|---------|
-| Daily snapshot | Last 7 days | First conversation of each day |
-| Weekly snapshot | Last 4 weeks | Every Monday first session |
+| 每日快照 | 最近7天 | 每天第一次对话 |
+| 每周快照 | 最近4周 | 每周一第一次会话 |
 
-### Backup Content
+### 备份内容
 
-| File/Directory | Description |
+| 文件/目录 | 描述 |
 |---------------|-------------|
-| `memory/*.md` | Daily memory files |
-| `MEMORY.md` | Long-term memory |
-| `USER.md`, `SOUL.md` | Configuration files |
-| other critical workspace files | As configured |
+| `memory/*.md` | 日常记忆文件 |
+| `MEMORY.md` | 长期记忆 |
+| `USER.md`, `SOUL.md` | 配置文件 |
+| 其他关键工作区文件 | 按配置 |
 
-### Rollback Process
+### 回滚流程
 
-When user says "rollback memory" or "restore backup":
+当用户说"回滚记忆"或"恢复备份"：
 
-1. List available snapshots (sorted by date descending, show date and size)
-2. User selects rollback point (e.g., "rollback to May 18")
-3. Backup current state first (in case rollback needs to be undone)
-4. Extract selected snapshot to workspace
-5. Report rollback results
+1. 列出可用快照（按日期降序排列，显示日期和大小）
+2. 用户选择回滚点（如"回滚到5月18日"）
+3. 先备份当前状态（以防需要撤销回滚）
+4. 将所选快照解压到工作区
+5. 报告回滚结果
 
-### Implementation Steps for Backup
+### 备份实施步骤
 
-1. Check that `memory/` directory exists and is readable
-2. Verify output directory has sufficient space (≥100MB)
-3. Create timestamped archive using tar/gzip
-4. Verify archive integrity (test with `tar -tzf`)
-5. Check file count matches expectations
-6. Clean up old snapshots beyond retention period
+1. 检查 `memory/` 目录是否存在且可读
+2. 验证输出目录有足够空间（≥100MB）
+3. 使用 tar/gzip 创建带时间戳的归档
+4. 验证归档完整性（用 `tar -tzf` 测试）
+5. 检查文件数量是否匹配预期
+6. 清理超出保留期的旧快照
 
-### Implementation Steps for Rollback
+### 回滚实施步骤
 
-1. List available snapshots
-2. Ask user to specify which version
-3. Create a pre-rollback backup for safety
-4. Extract selected snapshot
-5. Confirm completion
+1. 列出可用快照
+2. 请用户指定版本
+3. 创建回滚前安全备份
+4. 解压所选快照
+5. 确认完成
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| action | string | Yes | "backup" or "restore" or "list" |
-| snapshot_tag | string | For restore | Date tag to restore (e.g., "2026-05-18") |
-| retention_days | number | No | Override daily retention (default: 7) |
-| retention_weeks | number | No | Override weekly retention (default: 4) |
+| action | string | 是 | "backup" 或 "restore" 或 "list" |
+| snapshot_tag | string | 恢复时必填 | 要恢复的日期标签（如 "2026-05-18"） |
+| retention_days | number | 否 | 覆盖每日保留天数（默认: 7） |
+| retention_weeks | number | 否 | 覆盖每周保留周数（默认: 4） |
 
-## Examples
-
-```
-User: "backup my memory"
-Agent: Creates timestamped backup → verifies integrity → reports result.
-```
+## 示例
 
 ```
-User: "rollback memory to yesterday"
-Agent: Lists snapshots → confirms selection → creates pre-rollback safety backup → extracts snapshot.
+用户："备份我的记忆"
+智能体：创建带时间戳的备份 → 验证完整性 → 报告结果。
 ```
 
-## Notes
-- Always create a pre-rollback backup before restoring
-- Snapshots are stored in a dedicated backup directory (e.g., `backups/`)
-- Verify archive integrity after creation
-- Clean up old snapshots automatically after each backup
-- Works with tar/gzip for cross-platform compatibility
+```
+用户："回滚到昨天的记忆"
+智能体：列出快照 → 确认选择 → 创建回滚前安全备份 → 解压快照。
+```
+
+## 备注
+- 恢复前务必先创建回滚前备份
+- 快照存储在专用备份目录（如 `backups/`）
+- 创建后验证归档完整性
+- 每次备份后自动清理旧快照
+- 使用 tar/gzip 实现跨平台兼容

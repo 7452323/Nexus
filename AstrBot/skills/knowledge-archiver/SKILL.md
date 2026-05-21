@@ -1,71 +1,71 @@
-# Knowledge Archiver
+# 知识归档器 (Knowledge Archiver)
 
-## Description
-Automatically extracts valuable information from conversations and archives it to long-term memory (MEMORY.md). Triggered by keywords like "remember", "save", "archive", or upon discovery of important technical decisions, configuration changes, or workflow optimizations.
+## 描述
+自动从对话中提取有价值信息并归档到长期记忆（MEMORY.md）。由"记住"、"保存"、"归档"等关键词触发，或在发现重要技术决策、配置变更、工作流优化时自动触发。
 
-## Instructions
+## 指令
 
-### Trigger Conditions
+### 触发条件
 
-Trigger when ANY of these conditions are met:
+满足**任一**条件时触发：
 
-| Condition | Example |
+| 条件 | 示例 |
 |-----------|---------|
-| User says "remember", "save this", "archive" | "Remember this command" |
-| New API key or configuration discovered | "Found another API key" |
-| Important technical decision made | "We'll store all sources as JSON from now on" |
-| Workflow optimization discovered | "This script is 3x faster than the old one" |
-| Server configuration changed | "Changed SearXNG port to 28080" |
+| 用户说"记住"、"保存这个"、"归档" | "记住这个命令" |
+| 发现新 API 密钥或配置 | "又找到一个 API 密钥" |
+| 做出重要技术决策 | "以后所有源都用 JSON 格式存储" |
+| 发现工作流优化方案 | "这个脚本比旧方案快3倍" |
+| 服务器配置变更 | "把 SearXNG 端口改成 28080" |
 
-### Archive Format
+### 归档格式
 
 ```
-## [Date] [Category] [Topic]
+## [日期] [分类] [主题]
 
-- **Source**: xxx
-- **Content**: xxx
-- **Notes**: xxx
+- **来源**：xxx
+- **内容**：xxx
+- **备注**：xxx
 ```
 
-### Pre-archive Checklist
+### 归档前检查清单
 
-- [ ] Is the information already in MEMORY.md? (Search keywords to deduplicate)
-- [ ] Does it contain sensitive information (API keys, passwords → do NOT archive)?
-- [ ] Is the information accurate and reliable?
+- [ ] 这条信息是否已存在于 MEMORY.md？（搜索关键词去重）
+- [ ] 是否包含敏感信息（API 密钥、密码 → 不要归档）？
+- [ ] 信息是否准确可靠？
 
-### Implementation Steps
+### 实施步骤
 
-1. **Detect trigger** from user input or discovered context
-2. **Extract key information** — what, why, source, reliability
-3. **Deduplicate** — search MEMORY.md for existing entries
-4. **Check sensitivity** — skip if it contains passwords, private keys, personal data
-5. **Format** according to the archive template
-6. **Append to MEMORY.md** or relevant memory file
-7. **Confirm** with a brief acknowledgment
+1. **检测触发条件** — 从用户输入或发现上下文中检测
+2. **提取关键信息** — 是什么、为什么、来源、可靠性
+3. **去重** — 搜索 MEMORY.md 中已有条目
+4. **检查敏感性** — 跳过包含密码、私钥、个人数据的内容
+5. **按归档模板格式化**
+6. **追加到 MEMORY.md** 或相关记忆文件
+7. **确认** — 简短确认
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| content | string | Yes | Information to archive |
-| category | string | No | Category tag (e.g., "Config", "Tool", "Decision") |
-| source | string | No | Where this info came from |
+| content | string | 是 | 要归档的信息 |
+| category | string | 否 | 分类标签（如 "Config", "Tool", "Decision"） |
+| source | string | 否 | 信息来源 |
 
-## Examples
-
-```
-User: "Remember that the API endpoint is https://api.example.com/v2"
-Agent: (Checks for duplicates, formats, archives) → "Saved: API endpoint configuration."
-```
+## 示例
 
 ```
-User: "Save this debugging approach for future reference"
-Agent: (Extracts key technique, archives to MEMORY.md) → "Archived debugging technique."
+用户："记住，API 端点地址是 https://api.example.com/v2"
+智能体：（检查重复、格式化、归档）→ "已保存：API 端点配置。"
 ```
 
-## Notes
-- Never archive passwords, API keys, or private credentials
-- Deduplicate before archiving — check existing memory entries
-- Tag entries by category for easier retrieval
-- Keep entries concise but complete enough for future reference
-- Archive format uses the same structure as MEMORY.md for consistency
+```
+用户："把这个调试方法保存下来以后用"
+智能体：（提取关键技术、归档到 MEMORY.md）→ "已归档调试方法。"
+```
+
+## 备注
+- 绝不归档密码、API 密钥或私人凭证
+- 归档前先去重——检查已有记忆条目
+- 按分类添加标签便于检索
+- 条目保持简洁但信息完整，便于日后参考
+- 归档格式与 MEMORY.md 保持一致

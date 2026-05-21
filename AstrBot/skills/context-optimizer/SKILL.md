@@ -1,64 +1,64 @@
-# Context Optimizer
+# 上下文优化器 (Context Optimizer)
 
-## Description
-Automatically optimizes conversation context in long sessions. Preserves critical information while compressing or removing low-priority content. Prevents context window overflow and maintains quality in extended interactions.
+## 描述
+自动优化长会话中的对话上下文。保留关键信息，同时压缩或删除低优先级内容。防止上下文窗口溢出，在长时间交互中维持回复质量。
 
-## Instructions
+## 指令
 
-### Content Priority Levels
+### 内容优先级级别
 
-| Level | Content Type | Strategy |
+| 级别 | 内容类型 | 策略 |
 |-------|-------------|----------|
-| P0 Must Keep | Core instructions, current tasks, user configuration | No compression |
-| P1 Try to Keep | Completed subtask results, technical decisions, preferences | Summarize to 1-2 sentences |
-| P2 Can Compress | Debug logs, intermediate tool results, completed old tasks | Compress or delete |
-| P3 Can Delete | Confirmations ("OK", "got it"), repeated prompt text | Delete directly |
+| P0 必须保留 | 核心指令、当前任务、用户配置 | 不压缩 |
+| P1 尽量保留 | 已完成子任务结果、技术决策、偏好 | 摘要为1-2句 |
+| P2 可压缩 | 调试日志、中间工具结果、已完成旧任务 | 压缩或删除 |
+| P3 可删除 | 确认信息（"好的"、"收到"）、重复提示文本 | 直接删除 |
 
-### Trigger Conditions
+### 触发条件
 
-| Condition | Threshold |
+| 条件 | 阈值 |
 |-----------|-----------|
-| Context token usage | Exceeds 70% of maximum limit |
-| Session duration | Exceeds 30 minutes |
-| Manual trigger | User says "compress context" |
+| 上下文 token 用量 | 超过最大限制的70% |
+| 会话时长 | 超过30分钟 |
+| 手动触发 | 用户说"压缩上下文" |
 
-### Compression Steps
+### 压缩步骤
 
-1. Count tokens for each level (P0-P3)
-2. Delete all P3 content
-3. Compress P2 content to single sentence summary
-4. Merge duplicate P1 content
-5. Keep P0 content unchanged
-6. Output compression report: "Released X tokens (Y → Z)"
+1. 统计各级别（P0-P3）的 token 数量
+2. 删除所有 P3 内容
+3. 将 P2 内容压缩为单句摘要
+4. 合并重复的 P1 内容
+5. 保持 P0 内容不变
+6. 输出压缩报告："释放了 X token（Y → Z）"
 
-### Compression Report Example
+### 压缩报告示例
 
 ```
-Before compression: 45000 tokens
-After compression: 28000 tokens (released 37%)
-P0 Instructions: kept | P1 Summary: kept | P2 Logs: compressed | P3 Confirmations: deleted
+压缩前：45000 tokens
+压缩后：28000 tokens（节省37%）
+P0 指令：保留 | P1 摘要：保留 | P2 日志：压缩 | P3 确认信息：删除
 ```
 
-## Parameters
+## 参数
 
-| Parameter | Type | Description |
+| 参数名 | 类型 | 描述 |
 |-----------|------|-------------|
-| max_context_tokens | number | Maximum context window size (default: 100000) |
-| compression_threshold | number | Percentage threshold to trigger auto-compression (default: 70) |
+| max_context_tokens | number | 最大上下文窗口大小（默认: 100000） |
+| compression_threshold | number | 触发自动压缩的百分比阈值（默认: 70） |
 
-## Examples
+## 示例
 
 ```
-User: "compress context"
-Agent: "Compression report:
-- Before: 45000 tokens
-- After: 28000 tokens (released 37%)
-- P0 Instructions: kept | P1 Summary: kept | P2 Logs: compressed | P3 Confirmations: deleted"
+用户："压缩上下文"
+智能体："压缩报告：
+- 压缩前：45000 tokens
+- 压缩后：28000 tokens（节省37%）
+- P0 指令：保留 | P1 摘要：保留 | P2 日志：压缩 | P3 确认信息：删除"
 ```
 
-## Notes
-- P0 content is never compressed under any circumstances
-- User can manually trigger compression at any time
-- When auto-triggered, ask for confirmation before compressing
-- Compression preserves the semantic meaning of compressed content
-- Useful for long-running coding sessions or extended analysis tasks
+## 备注
+- P0 内容在任何情况下都不压缩
+- 用户可以随时手动触发压缩
+- 自动触发时，先请求确认再执行压缩
+- 压缩保留被压缩内容的语义含义
+- 适用于长时间编码会话或扩展分析任务
