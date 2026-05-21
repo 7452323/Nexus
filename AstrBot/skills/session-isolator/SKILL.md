@@ -1,86 +1,86 @@
-# Session Isolator
+# 会话隔离器 (Session Isolator)
 
-## Description
-Establishes privacy boundaries between different conversation channels. Ensures that private/direct messages are not exposed in group chats or other platforms. Filters memory searches by source channel to maintain context isolation.
+## 描述
+在不同对话通道之间建立隐私边界。确保私密/直接消息不会暴露到群聊或其他平台。按来源通道过滤记忆搜索，保持上下文隔离。
 
-## Instructions
+## 指令
 
-### Channel Rules
+### 通道规则
 
-#### Private Chat — Owner Conversations
+#### 私聊 — 主人的对话
 ```
-Allowed:
-  - Answer any question from the owner
-  - Read and manipulate workspace files and configuration
-  - Execute all management operations
-  - Use API key-dependent skills
+允许：
+  - 回答主人的任何问题
+  - 读取和操作工作区文件与配置
+  - 执行所有管理操作
+  - 使用依赖 API 密钥的技能
 
-Prohibited:
-  - Reveal owner information to other platforms
-  - Leak other platform conversations to the current one
-```
-
-#### Group Chat / Public Channels
-```
-Allowed:
-  - Answer questions about public projects
-  - Share technical knowledge
-  - Provide general help
-
-Prohibited:
-  - Expose owner name, address, contact info
-  - Mention private conversation content
-  - Execute sensitive operations (file deletion, config modification)
-  - Use API key-dependent skills (unless owner explicitly allows in group)
+禁止：
+  - 向其他平台透露主人信息
+  - 将其他平台的对话泄露到当前通道
 ```
 
-### Context Cleanup
+#### 群聊 / 公共通道
+```
+允许：
+  - 回答关于公共项目的问题
+  - 分享技术知识
+  - 提供常规帮助
 
-| Source | Cleanup Interval | Retention Limit |
+禁止：
+  - 暴露主人姓名、地址、联系方式
+  - 提及私聊内容
+  - 执行敏感操作（文件删除、配置修改）
+  - 使用依赖 API 密钥的技能（除非主人明确允许在群内使用）
+```
+
+### 上下文清理
+
+| 来源 | 清理间隔 | 保留上限 |
 |--------|-----------------|-----------------|
-| Private chat | 6 hours | 10000 messages |
-| Group chat | 6 hours | 5000 messages |
-| Other platforms | 6 hours | 10000 messages |
+| 私聊 | 6小时 | 10000条消息 |
+| 群聊 | 6小时 | 5000条消息 |
+| 其他平台 | 6小时 | 10000条消息 |
 
-### Memory Isolation
+### 记忆隔离
 
-When performing memory searches, filter by source:
-- Private chat session → memory_search returns only private chat matches
-- Group chat session → memory_search returns only public-relevant matches
+执行记忆搜索时，按来源过滤：
+- 私聊会话 → memory_search 只返回私聊匹配结果
+- 群聊会话 → memory_search 只返回公共相关匹配结果
 
-### Pre-Reply Checklist
+### 回复前检查清单
 
-Before replying cross-platform:
-- [ ] Recipient is owner? → Can reveal any content
-- [ ] Recipient is group? → Check for owner privacy in response
-- [ ] Response references another channel's conversation? → Delete reference
-- [ ] Involves sensitive operation? → Reject in group chat
-- [ ] Requires API key skill? → Reject in group (unless owner authorized)
+在跨平台回复之前：
+- [ ] 接收者是主人？→ 可以披露任何内容
+- [ ] 接收者是群聊？→ 确保回复中不含主人隐私
+- [ ] 回复引用了另一个通道的对话？→ 删除引用
+- [ ] 涉及敏感操作？→ 在群聊中拒绝
+- [ ] 需要 API 密钥技能？→ 在群中拒绝（除非主人授权）
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| channel_type | string | Yes | "private" or "group" or "public" |
-| action | string | Yes | User action to validate |
-| referenced_source | string | No | Source of referenced content, if any |
+| channel_type | string | 是 | "private" 或 "group" 或 "public" |
+| action | string | 是 | 要验证的用户操作 |
+| referenced_source | string | 否 | 引用内容的来源，如果有 |
 
-## Examples
-
-```
-Scenario: User in group chat asks "What's my API key?"
-Action: Session Isolator identifies group chat → rejects sensitive operation → "I cannot share API keys in this channel."
-```
+## 示例
 
 ```
-Scenario: Owner in private chat asks "Deploy the new version"
-Action: Session Isolator identifies private chat → allows all operations → executes deploy.
+场景：用户在群聊中问"我的 API 密钥是什么？"
+操作：会话隔离器识别出群聊 → 拒绝敏感操作 → "我无法在此频道共享 API 密钥。"
 ```
 
-## Notes
-- Default channel type is "private" when unsure
-- Cross-channel references are automatically stripped
-- Memory search results are filtered by current channel type
-- Context cleanup limits prevent memory leaks across sessions
-- Rules apply symmetrically — no channel leaks to another
-- Group chat sensitivity is conservative: block when in doubt
+```
+场景：主人在私聊中说"部署新版本"
+操作：会话隔离器识别出私聊 → 允许所有操作 → 执行部署。
+```
+
+## 备注
+- 不确定时默认通道类型为 "private"
+- 跨通道引用自动剥离
+- 记忆搜索结果按当前通道类型过滤
+- 上下文清理限制防止跨会话记忆泄露
+- 规则对称适用——任何通道都不会泄露到另一个通道
+- 群聊敏感性保守处理：有疑问时一律阻止

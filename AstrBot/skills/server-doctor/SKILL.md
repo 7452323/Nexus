@@ -1,87 +1,87 @@
-# Server Doctor
+# 服务器诊断器 (Server Doctor)
 
-## Description
-One-click server diagnostic tool. Automatically checks system resources, service health, and network connectivity when the server appears to be having issues. Provides actionable repair suggestions and can auto-fix common problems.
+## 描述
+一键服务器诊断工具。当服务器出现问题时，自动检查系统资源、服务健康和网络连接。提供可操作的修复建议，并能自动修复常见问题。
 
-## Instructions
+## 指令
 
-### Diagnostic Flow
+### 诊断流程
 
 ```
-Step 1: Check System Resources
-  CPU > 80% -> Inspect top 10 processes
-  Memory > 85% -> Inspect top 5 memory-consuming processes
-  Disk > 85% -> Find files larger than 1GB
+第1步：检查系统资源
+  CPU > 80% -> 检查前10个进程
+  内存 > 85% -> 检查前5个占用内存最多的进程
+  磁盘 > 85% -> 查找大于 1GB 的文件
 
-Step 2: Check Agent Service
-  Process running? -> If not, attempt to start
-  Port listening? -> If not, check logs
+第2步：检查智能体服务
+  进程是否运行？-> 如果没有，尝试启动
+  端口是否监听？-> 如果没有，检查日志
 
-Step 3: Check Critical Services
-  Docker -> Status + container list
-  Web servers -> Reachability
-  Other configured services -> Status
+第3步：检查关键服务
+  Docker -> 状态 + 容器列表
+  Web 服务器 -> 可达性
+  其他配置的服务 -> 状态
 
-Step 4: Check Network
-  External -> ping 8.8.8.8
-  DNS -> resolve github.com
-  Primary API provider -> Test connectivity
+第4步：检查网络
+  外部 -> ping 8.8.8.8
+  DNS -> 解析 github.com
+  主 API 提供商 -> 测试连接
 ```
 
-### Auto-Fix Actions
+### 自动修复操作
 
-| Problem | Auto-Fix Method |
+| 问题 | 自动修复方法 |
 |---------|-----------------|
-| Process not running | Attempt to start the service |
-| Disk low | Clean logs, cache, temp files |
-| Docker not running | `systemctl start docker` |
+| 进程未运行 | 尝试启动服务 |
+| 磁盘空间低 | 清理日志、缓存、临时文件 |
+| Docker 未运行 | `systemctl start docker` |
 
-### Diagnostic Report Format
+### 诊断报告格式
 
 ```
 CPU: 25% ✅
-Memory: 2.0/2.4 GB (83%) ⚠️ Monitor
-Disk: 20/39 GB (51%) ✅
-Uptime: 15 days
-Agent Service: Running ✅
-Docker: Running ✅ (3 containers)
-Network: Reachable ✅
+内存: 2.0/2.4 GB (83%) ⚠️ 需关注
+磁盘: 20/39 GB (51%) ✅
+运行时间: 15天
+智能体服务: 运行中 ✅
+Docker: 运行中 ✅（3个容器）
+网络: 可达 ✅
 ```
 
-### Implementation Steps
+### 实施步骤
 
-1. Execute commands to gather system metrics (top, free, df)
-2. Check if agent service is running (ps aux / systemctl)
-3. Check key services (docker ps, curl localhost:port)
-4. Test network connectivity (ping, dig, curl)
-5. Generate formatted report
-6. If any issue found, propose fix
-7. For auto-fixable issues, ask user permission then execute fix
+1. 执行命令收集系统指标（top, free, df）
+2. 检查智能体服务是否运行（ps aux / systemctl）
+3. 检查关键服务（docker ps, curl localhost:port）
+4. 测试网络连接（ping, dig, curl）
+5. 生成格式化报告
+6. 如有问题，提出修复方案
+7. 对于可自动修复的问题，征得用户许可后执行修复
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| quick_mode | boolean | No | Skip detailed analysis, only show summary (default: false) |
-| auto_fix | boolean | No | Attempt auto-fix without asking (default: false, ask first) |
-| services | array | No | Custom list of services to check |
+| quick_mode | boolean | 否 | 跳过详细分析，只显示摘要（默认: false） |
+| auto_fix | boolean | 否 | 自动修复而不询问（默认: false，先询问） |
+| services | array | 否 | 自定义要检查的服务列表 |
 
-## Examples
-
-```
-User: "diagnose the server"
-Agent: Runs all 4 diagnostic steps → generates report → "CPU: 25% ✅ | Memory: 83% ⚠️ | Disk: 51% ✅ | Agent: Running ✅ | Docker: 3 containers ✅"
-```
+## 示例
 
 ```
-User: "server is slow"
-Agent: Checks CPU/memory → finds memory > 85% → lists top processes → "Memory usage high. Top consumer: node (1.2GB). Suggest restarting."
+用户："诊断一下服务器"
+智能体：运行全部4个诊断步骤 → 生成报告 → "CPU: 25% ✅ | 内存: 83% ⚠️ | 磁盘: 51% ✅ | 智能体: 运行中 ✅ | Docker: 3个容器 ✅"
 ```
 
-## Notes
-- Quick mode only shows summary without detailed process lists
-- Auto-fix requires explicit user opt-in or confirmation per action
-- Network checks use standard tools (ping, curl) available on most Linux systems
-- For non-standard services, user must configure custom service checks
-- Report uses ✅ for healthy, ⚠️ for warnings, ❌ for critical
-- Always run disk clean suggestions past the user first
+```
+用户："服务器好慢"
+智能体：检查 CPU/内存 → 发现内存 > 85% → 列出占用进程 → "内存使用率高。最高消耗者：node (1.2GB)。建议重启。"
+```
+
+## 备注
+- 快捷模式只显示摘要，不含详细进程列表
+- 自动修复需要用户明确选择或逐项确认
+- 网络检查使用大多数 Linux 系统上可用的标准工具（ping, curl）
+- 对于非标准服务，用户需要配置自定义服务检查
+- 报告使用 ✅ 表示健康，⚠️ 表示警告，❌ 表示严重
+- 磁盘清理建议先征求用户同意

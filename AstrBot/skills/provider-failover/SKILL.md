@@ -1,78 +1,78 @@
-# Provider Failover
+# 提供商故障转移 (Provider Failover)
 
-## Description
-Automatically detects when the primary API provider becomes unavailable and seamlessly fails over to backup services. Monitors provider health and restores primary when it recovers. Provides transparent failover with notification.
+## 描述
+自动检测主 API 提供商何时不可用，并无缝切换到备用服务。监控提供商健康状态，在主提供商恢复时切回。提供透明故障转移并附带通知。
 
-## Instructions
+## 指令
 
-### Failure Detection
+### 故障检测
 
-| Anomaly Type | Detection Condition |
+| 异常类型 | 检测条件 |
 |-------------|---------------------|
-| HTTP 5xx | Status code >= 500 |
-| Timeout | No response within 15 seconds |
-| Insufficient balance | total_balance < 0.01 |
-| Rate limited (429) | Status code = 429 |
-| Auth failure (401) | Status code = 401 |
+| HTTP 5xx | 状态码 >= 500 |
+| 超时 | 15秒内无响应 |
+| 余额不足 | total_balance < 0.01 |
+| 被限流 (429) | 状态码 = 429 |
+| 认证失败 (401) | 状态码 = 401 |
 
-### Failover Flow
+### 故障转移流程
 
 ```
-Request primary provider
-  -> Success -> Return normally
-  -> Failure -> Wait 5 seconds -> Retry once
-       -> Success -> Return normally
-       -> Fail again -> Switch to backup provider
-            -> Success -> Mark as active for continued use
-            -> All failed -> Notify user all providers unavailable
+请求主提供商
+  -> 成功 -> 正常返回
+  -> 失败 -> 等待5秒 -> 重试一次
+       -> 成功 -> 正常返回
+       -> 再次失败 -> 切换到备用提供商
+            -> 成功 -> 标记为活跃，继续使用
+            -> 全部失败 -> 通知用户所有提供商不可用
 ```
 
-### Provider Priority
+### 提供商优先级
 
-1. Primary provider (check balance, highest first)
-2. Secondary provider
-3. Tertiary provider (free tier, only when others are fully down)
+1. 主提供商（检查余额，余额高者优先）
+2. 次要提供商
+3. 第三提供商（免费版，仅在其他全都不可用时）
 
-### Recovery Check
+### 恢复检查
 
-- Every 30 minutes, automatically check if primary provider has recovered
-- When recovered, switch back to primary
-- Failover events are logged to `logs/provider-failover.log`
+- 每30分钟自动检查主提供商是否已恢复
+- 恢复后切换回主提供商
+- 故障转移事件记录到 `logs/provider-failover.log`
 
-### Implementation Steps
+### 实施步骤
 
-1. **Configure providers** — list of providers with endpoints, auth, and priority
-2. **On each API call** — attempt primary, detect failure, fallback
-3. **On failover** — log event, notify user if persistent
-4. **Health check** — periodic background check on primary
-5. **Restore** — when primary recovers, switch back and notify
+1. **配置提供商** — 提供商列表，包含端点、认证和优先级
+2. **每次 API 调用时** — 尝试主提供商，检测失败，回退
+3. **故障转移时** — 记录事件，持续失败则通知用户
+4. **健康检查** — 定时后台检查主提供商
+5. **恢复** — 主提供商恢复后切回并通知
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| providers | array | Yes | List of provider configurations with endpoint, auth, priority |
-| retry_count | number | No | Retries before failover (default: 1) |
-| retry_delay | number | No | Delay between retries in ms (default: 5000) |
-| health_check_interval | number | No | Primary health check interval in ms (default: 1800000) |
-| timeout_ms | number | No | Request timeout in ms (default: 15000) |
+| providers | array | 是 | 提供商配置列表，含 endpoint、auth、priority |
+| retry_count | number | 否 | 故障转移前重试次数（默认: 1） |
+| retry_delay | number | 否 | 重试间隔毫秒数（默认: 5000） |
+| health_check_interval | number | 否 | 主提供商健康检查间隔毫秒数（默认: 1800000） |
+| timeout_ms | number | 否 | 请求超时毫秒数（默认: 15000） |
 
-## Examples
-
-```
-Scenario: Primary provider returns 503
-Action: Wait 5s → retry → still fails → switch to backup → mark backup active → notify user.
-```
+## 示例
 
 ```
-Scenario: Provider recovery check finds primary healthy
-Action: Switch back to primary → notify user → log recovery event.
+场景：主提供商返回 503
+操作：等待5秒 → 重试 → 仍然失败 → 切换到备用 → 标记备用活跃 → 通知用户。
 ```
 
-## Notes
-- Maintain a simple priority-ordered list of providers
-- Check account balance before routing to a provider
-- Log all failover events with timestamps and reasons
-- Notify user on first failover, not on every retry
-- Retry once with delay before failing over (transient errors are common)
-- Health check interval: 30 minutes for primary recovery monitoring
+```
+场景：提供商恢复检查发现主提供商正常
+操作：切回主提供商 → 通知用户 → 记录恢复事件。
+```
+
+## 备注
+- 维护一个简单的按优先级排序的提供商列表
+- 在路由到提供商之前检查账户余额
+- 记录所有故障转移事件，包含时间戳和原因
+- 仅在首次故障转移时通知用户，不是每次重试都通知
+- 故障转移前先带延迟重试一次（瞬态错误很常见）
+- 健康检查间隔：主提供商恢复监控为30分钟

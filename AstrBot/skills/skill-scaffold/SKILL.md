@@ -1,78 +1,78 @@
-# Skill Scaffold
+# 技能脚手架 (Skill Scaffold)
 
-## Description
-A skill scaffold generator that creates properly formatted SKILL.md files based on user requirements. Automatically structures the skill with description, instructions, parameters, examples, and notes sections.
+## 描述
+一个技能脚手架生成器，根据用户需求创建格式正确的 SKILL.md 文件。自动结构化技能的描述、指令、参数、示例和备注部分。
 
-## Instructions
+## 指令
 
-### Template Structure
+### 模板结构
 
 ```markdown
-# {Skill Name}
+# {技能名称}
 
-## Description
-{Short description of what this skill does}
+## 描述
+{简要描述该技能的作用}
 
-## Instructions
-{Detailed step-by-step instructions for the agent to execute this skill}
+## 指令
+{供智能体执行的详细分步说明}
 
-## Parameters
-{Optional parameter definitions}
+## 参数
+{可选的参数定义}
 
-## Examples
-{Usage examples}
+## 示例
+{使用示例}
 
-## Notes
-{Safety notes, constraints, tips}
+## 备注
+{安全说明、约束、提示}
 ```
 
-### Generation Process
+### 生成流程
 
-When user says "write me a skill for X":
+当用户说"帮我写一个 XXX 的技能"：
 
-1. Ask user: "What does this skill do?" — Understand the core functionality
-2. Ask user: "Trigger method — manual (keyword) or automatic (condition)?"
-3. Ask user: "Input and output — what does it take, what does it produce?"
-4. Generate SKILL.md using the template
-5. Save to `skills/{skill-name}/SKILL.md`
-6. Inform user of file location
+1. 询问用户："这个技能是做什么的？" — 了解核心功能
+2. 询问用户："触发方式——手动（关键词）还是自动（条件）？"
+3. 询问用户："输入和输出——它接收什么，产生什么？"
+4. 使用模板生成 SKILL.md
+5. 保存到 `skills/{技能名称}/SKILL.md`
+6. 告知用户文件位置
 
-### Quality Checklist
+### 质量检查清单
 
-- [ ] Description clearly states purpose in 1-2 sentences
-- [ ] Instructions are actionable steps the agent can follow
-- [ ] Required parameters are documented with types
-- [ ] Examples show realistic usage scenarios
-- [ ] Notes cover safety, constraints, and edge cases
-- [ ] No OpenClaw-specific API references (use standard shell/Python)
-- [ ] SKILL.md uses the correct Anthropic Skills format
+- [ ] 描述用1-2句话清楚说明用途
+- [ ] 指令是智能体可执行的操作步骤
+- [ ] 必填参数已记录类型
+- [ ] 示例展示真实的使用场景
+- [ ] 备注包含安全、约束和边界情况
+- [ ] 不包含特定平台的 API 引用（使用标准 shell/Python）
+- [ ] SKILL.md 使用正确的 Anthropic Skills 格式
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| skill_name | string | Yes | Name of the skill to scaffold |
-| skill_description | string | Yes | What the skill does |
-| trigger_type | string | Yes | "manual" or "automatic" |
-| input_description | string | No | What inputs the skill needs |
-| output_description | string | No | What the skill produces |
+| skill_name | string | 是 | 要搭建的技能名称 |
+| skill_description | string | 是 | 技能的用途 |
+| trigger_type | string | 是 | "manual" 或 "automatic" |
+| input_description | string | 否 | 技能需要什么输入 |
+| output_description | string | 否 | 技能产生什么输出 |
 
-## Examples
-
-```
-User: "Write me a skill for checking weather"
-Agent: Asks about functionality, trigger, input/output → Generates SKILL.md → "Saved to skills/weather-checker/SKILL.md"
-```
+## 示例
 
 ```
-User: "I need a skill that monitors my server CPU"
-Agent: Walks through scaffolding questions → "Let me generate this for you..."
+用户："帮我写一个查天气的技能"
+智能体：询问功能、触发方式、输入/输出 → 生成 SKILL.md → "已保存到 skills/weather-checker/SKILL.md"
 ```
 
-## Notes
-- Always ask clarifying questions before generating — a good scaffold depends on clear requirements
-- Follow the standard Anthropic Skills format (SKILL.md)
-- Avoid platform-specific APIs (like OpenClaw's kvStore, Env, etc.)
-- Use standard shell commands and Python for executable parts
-- Include a pre-generation checklist to ensure completeness
-- Generated skills should be immediately usable without modification
+```
+用户："我需要一个监控服务器 CPU 的技能"
+智能体：逐项询问脚手架问题 → "我来帮你生成..."
+```
+
+## 备注
+- 生成前一定要问清楚需求——好的脚手架依赖明确的需求
+- 遵循标准 Anthropic Skills 格式（SKILL.md）
+- 避免平台特定的 API（如 OpenClaw 的 kvStore, Env 等）
+- 可执行部分使用标准 shell 命令和 Python
+- 包含生成前检查清单以确保完整性
+- 生成的技能应该无需修改即可立即使用

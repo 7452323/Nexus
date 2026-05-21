@@ -1,79 +1,79 @@
-# Rate Limiter
+# 速率限制器 (Rate Limiter)
 
-## Description
-Controls request frequency to external APIs to prevent triggering rate limits. Implements exponential backoff, concurrent request limiting, and API-specific rate thresholds.
+## 描述
+控制对外部 API 的请求频率，防止触发速率限制。实现指数退避、并发请求限制和 API 特定的速率阈值。
 
-## Instructions
+## 指令
 
-### API Rate Limits
+### API 速率限制
 
-| API | Per Minute | Per Day | Throttle Behavior |
+| API | 每分钟 | 每天 | 节流行为 |
 |-----|-----------|---------|-------------------|
-| Generic (Calls) | 120 | — | Wait 2 seconds |
-| GitHub (Anonymous) | 10 | — | Wait 10s + exponential backoff |
-| GitHub (Token) | 30 | 5000 | Wait 5s + exponential backoff |
-| DeepSeek | 60 | 10000 | Wait 60s then retry |
+| 通用（调用次数） | 120 | — | 等待2秒 |
+| GitHub（匿名） | 10 | — | 等待10秒 + 指数退避 |
+| GitHub（带 Token） | 30 | 5000 | 等待5秒 + 指数退避 |
+| DeepSeek | 60 | 10000 | 等待60秒后重试 |
 
-### Exponential Backoff
+### 指数退避
 
 ```
-1st trigger -> Wait 2 seconds -> retry
-2nd trigger -> Wait 4 seconds -> retry
-3rd trigger -> Wait 8 seconds -> retry
-4th trigger -> Wait 16 seconds -> retry
-5th trigger -> Wait 30 seconds -> notify user
+第1次触发 -> 等待2秒 -> 重试
+第2次触发 -> 等待4秒 -> 重试
+第3次触发 -> 等待8秒 -> 重试
+第4次触发 -> 等待16秒 -> 重试
+第5次触发 -> 等待30秒 -> 通知用户
 ```
 
-### Concurrency Control
+### 并发控制
 
-| Config Item | Default |
+| 配置项 | 默认值 |
 |-------------|---------|
-| Max concurrent requests | 3 |
-| Max queue length | 20 |
-| Queue full behavior | Return "Queue full, please try later" |
+| 最大并发请求数 | 3 |
+| 最大队列长度 | 20 |
+| 队列满时行为 | 返回"队列已满，请稍后再试" |
 
-### Implementation Steps
+### 实施步骤
 
-1. **Before each external API call:**
-   - Check current request count for the target API
-   - If near limit, calculate required delay
-   - Apply exponential backoff if rate-limited
-   - Track concurrency, queue if at max
+1. **每次外部 API 调用前：**
+   - 检查目标 API 的当前请求计数
+   - 如果接近限制，计算所需延迟
+   - 如果被限流，应用指数退避
+   - 跟踪并发数，达到上限时排队
 
-2. **On rate limit hit:**
-   - Calculate backoff delay
-   - Wait and retry once
-   - If still rate-limited on 5th attempt, notify user
+2. **遇到速率限制时：**
+   - 计算退避延迟
+   - 等待后重试一次
+   - 如果第5次尝试仍被限流，通知用户
 
-3. **On successful request:**
-   - Update rate counter
-   - Reset backoff multiplier
+3. **请求成功时：**
+   - 更新速率计数器
+   - 重置退避倍数
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| api_name | string | Yes | Target API identifier (e.g., "github", "deepseek") |
-| max_concurrent | number | No | Override max concurrent requests |
-| rate_per_minute | number | No | Override per-minute rate limit |
-| rate_per_day | number | No | Override per-day rate limit |
+| api_name | string | 是 | 目标 API 标识（如 "github", "deepseek"） |
+| max_concurrent | number | 否 | 覆盖最大并发请求数 |
+| rate_per_minute | number | 否 | 覆盖每分钟速率限制 |
+| rate_per_day | number | 否 | 覆盖每天速率限制 |
 
-## Examples
-
-```
-Scenario: Making 50 GitHub API calls quickly
-Action: Rate limiter throttles to 10/min for anonymous → queues remaining → processes with delays.
-```
+## 示例
 
 ```
-Scenario: DeepSeek API returns 429
-Action: Calculate backoff → wait 60s → retry → if fails again, increase backoff → notify user at 5th failure.
+场景：快速发起 50 次 GitHub API 调用
+操作：速率限制器将匿名访问节流到 10/min → 排队剩余请求 → 带延迟处理。
 ```
 
-## Notes
-- Rate limits are per-API, not global
-- Exponential backoff resets after a successful request
-- Concurrency limit is global across all APIs
-- Queue overflow returns an error rather than blocking indefinitely
-- Adjust limits based on the specific API's documented rate limits
-- For batch operations, insert delays between requests proactively
+```
+场景：DeepSeek API 返回 429
+操作：计算退避 → 等待60秒 → 重试 → 如果再次失败，增加退避 → 第5次失败时通知用户。
+```
+
+## 备注
+- 速率限制是按 API 的，不是全局的
+- 指数退避在请求成功后重置
+- 并发限制是所有 API 全局的
+- 队列溢出返回错误，不会无限阻塞
+- 根据具体 API 文档中的速率限制调整限制值
+- 对于批量操作，主动在请求之间插入延迟
