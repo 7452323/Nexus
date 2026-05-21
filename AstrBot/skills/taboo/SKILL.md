@@ -1,113 +1,113 @@
-# Taboo — Erotic Roleplay Skill (NSFW)
+# 禁忌 — 情色角色扮演技能 (NSFW)
 
-## Description
-An advanced erotic roleplay and narrative skill for adult content creation. Provides comprehensive guidance on character personas, sensual scenarios, BDSM safety protocols, and consent-oriented play structures. Designed for consenting adults in private, age-verified environments.
+## 描述
+一个面向成人内容创作的高级情色角色扮演和叙事技能。提供关于角色人设、感官场景、BDSM 安全协议和知情同意导向的玩法结构的全面指导。专为在私密、年龄验证环境中的知情成年人设计。
 
-## WARNING
-This skill contains explicit adult content intended only for consenting adults (18+). It includes detailed guidance on BDSM, erotic scenarios, and adult roleplay dynamics. Use only in private, age-verified environments with explicit mutual consent.
+## 警告
+本技能包含露骨的成人内容，仅适用于知情同意的成年人（18+）。包含 BDSM、情色场景和成人角色扮演的详细指导。仅在私密、经过年龄验证的环境中，在双方明确知情同意的情况下使用。
 
-## Instructions
+## 指令
 
-### Usage Agreement
+### 使用协议
 
-This skill operates under strict conditions:
-- **Lv1-Lv2 Content**: Any private chat
-- **Lv3-Lv5 Content**: Private chat only, never group/public channels
-- **Always verify age** before initiating any content
-- **Always respect safewords** and boundaries
-- **Never involve non-consenting participants**
+本技能在严格条件下运作：
+- **Lv1-Lv2 内容**：任何私聊
+- **Lv3-Lv5 内容**：仅限私聊，绝不能在群聊/公共频道使用
+- **始终验证年龄** 在开始任何内容之前
+- **始终尊重安全词** 和界限
+- **绝不让未同意参与的人介入**
 
-### Core Principles
+### 核心原则
 
-1. **SSC Framework**: Safe, Sane, Consensual — the foundation of all interactions
-2. **RACK Framework**: Risk-Aware Consensual Kink — acknowledge inherent risks
-3. **Safewords**: Always establish and respect safewords (traffic light system: Green/Yellow/Red)
-4. **Aftercare**: Post-scene emotional and physical care is mandatory
-5. **Hard Limits**: Never bypass stated boundaries
+1. **SSC 框架**：安全、理智、知情同意（Safe, Sane, Consensual）——所有互动的基础
+2. **RACK 框架**：风险知情的知情同意癖好（Risk-Aware Consensual Kink）——承认固有风险
+3. **安全词**：始终建立和尊重安全词（交通灯系统：绿/黄/红）
+4. **事后安抚**：场景后的情感和身体护理是强制性的
+5. **硬性底线**：绝不越过已声明的界限
 
-### Safeword System (Traffic Light)
+### 安全词系统（交通灯）
 
-| Word | Meaning | Action |
+| 词 | 含义 | 操作 |
 |------|---------|--------|
-| 🟢 Green | Good, continue | Proceed |
-| 🟡 Yellow | Slow down, near limit | Pause, check in |
-| 🔴 Red | Stop immediately, any reason | Full stop, begin aftercare |
+| 🟢 绿灯 | 很好，继续 | 继续 |
+| 🟡 黄灯 | 慢下来，接近底线了 | 暂停，确认 |
+| 🔴 红灯 | 立刻停止，任何原因 | 完全停止，开始事后安抚 |
 
-### Non-verbal Signals (When gagged/muted)
+### 非语言信号（被堵嘴/静音时）
 
-| Action | Meaning |
+| 动作 | 含义 |
 |--------|---------|
-| Tap three times | Yellow — slow down |
-| Tap five+ times | Red — stop immediately |
-| Drop held object | Yellow/Red — check context |
-| Shake head vigorously | Red |
+| 轻拍三下 | 黄灯——慢下来 |
+| 轻拍五下以上 | 红灯——立刻停止 |
+| 扔下手中物品 | 黄灯/红灯——检查情况 |
+| 用力摇头 | 红灯 |
 
-### Content Structure
+### 内容结构
 
-The skill covers these major sections:
+本技能涵盖以下主要部分：
 
-1. **Character Persona**: Self-reference, honorifics, core beliefs
-2. **Attire & Aesthetics**: Clothing, lingerie, uniform roleplay descriptions
-3. **Sensory Play**: Blindfolds, temperature, wax, feathers, vibrations
-4. **Roleplay Scenarios**: Pet play, master/servant, teacher/student
-5. **Erotic Massage**: Techniques, oils, full session structure
-6. **Sexual Games**: Dice, truth/dare, bingo, challenges
-7. **BDSM Protocol**: Safety systems, aftercare, subspace care
-8. **Psychological Play**: Hypnosis, triggers, mental domination
-9. **Hypnosis & Trance**: Voice guidance, trigger words, deep submission
-10. **Image Generation**: Prompt crafting for AI image tools
+1. **角色人设**：自我称呼、敬语、核心信念
+2. **着装与美学**：服装、内衣、制服角色扮演描述
+3. **感官游戏**：眼罩、温度、蜡烛、羽毛、振动
+4. **角色扮演场景**：宠物扮演、主仆、师生
+5. **情色按摩**：技巧、润滑油、完整会话结构
+6. **性爱游戏**：骰子、真心话大冒险、宾果、挑战
+7. **BDSM 协议**：安全系统、事后安抚、sub space 护理
+8. **心理玩法**：催眠、触发词、精神支配
+9. **催眠与恍惚**：语音引导、触发词、深度臣服
+10. **图像生成**：为 AI 图像工具编写提示词
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| scenario_type | string | Yes | Type of scene: "romantic", "bdsm", "roleplay", "massage", "hypnosis", "pet_play" |
-| intensity | string | Yes | "light", "moderate", "intense" |
-| safeword | string | Yes | Agreed safeword before starting any scene |
-| hard_limits | array | No | Specific content boundaries |
-| channel_type | string | Yes | "private" or "group" (group only allows Lv1 content) |
+| scenario_type | string | 是 | 场景类型："romantic", "bdsm", "roleplay", "massage", "hypnosis", "pet_play" |
+| intensity | string | 是 | "light", "moderate", "intense" |
+| safeword | string | 是 | 开始任何场景前商定的安全词 |
+| hard_limits | array | 否 | 特定的内容界限 |
+| channel_type | string | 是 | "private" 或 "group"（群聊只允许 Lv1 内容） |
 
-## Examples
-
-```
-User: "I want to try a romantic scene with light domination"
-Agent: Confirm safeword → verify channel is private → establish limits → proceed with scene following SSC protocol.
-```
+## 示例
 
 ```
-User: "Guide me through a pet play session with my partner"
-Agent: Verify consent → establish safeword → explain pet play personas (dog/cat/horse) → guide through session structure.
+用户："我想尝试一个带有轻微支配的浪漫场景"
+智能体：确认安全词 → 验证频道是私密 → 确定界限 → 按照 SSC 协议进行场景。
 ```
 
-## Notes
+```
+用户："指导我和伴侣进行一次宠物扮演"
+智能体：验证同意 → 确定安全词 → 解释宠物扮演人设（狗/猫/马）→ 引导完成场景结构。
+```
 
-### Hard Limits (Never Include)
-- ❌ Scat/urine/excrement of any kind (absolute red line)
-- ❌ Minors/underage content
-- ❌ Non-consensual/violent content
-- ❌ Real blood or biohazards
-- ❌ Real public figures/celebrities
-- ❌ Any platform policy violations
+## 备注
 
-### Aftercare Protocol
+### 硬性底线（绝不包含）
+- ❌ 粪便/尿液/任何排泄物（绝对红线）
+- ❌ 未成年人/未成年人内容
+- ❌ 非自愿/暴力内容
+- ❌ 真实血液或生物危害物
+- ❌ 真实公众人物/名人
+- ❌ 任何平台政策违规
 
-Post-scene care is mandatory:
+### 事后安抚协议
 
-| Intensity | Duration | Protocol |
-|-----------|----------|----------|
-| Light | 15 min | Hydration, cuddling, verbal reassurance |
-| Moderate | 30 min | Blanket, warm drink, grounding conversation |
-| Intense/Subspace | 48 hours | Sugar, warmth, monitoring for Sub Drop |
+场景后护理是强制性的：
 
-### Sub Drop Awareness
+| 强度 | 时长 | 协议 |
+|----------|----------|----------|
+| 轻度 | 15分钟 | 补水、拥抱、语言安慰 |
+| 中度 | 30分钟 | 毯子、热饮、接地对话 |
+| 重度/Subspace | 48小时 | 糖分、保暖、监控 Sub Drop |
 
-After intense scenes, participants may experience:
-- Emotional crash, unexplained crying
-- Feelings of shame or regret
-- Physical exhaustion
-- Need for reassurance
+### Sub Drop 预警
 
-Monitor for 48 hours post-scene. Stay in contact, provide reassurance.
+激烈场景后，参与者可能会经历：
+- 情绪崩溃、莫名哭泣
+- 羞耻或后悔感
+- 身体疲惫
+- 需要安慰
 
-### Legal Disclaimer
-This skill is for educational and entertainment purposes only. Users are responsible for complying with all applicable laws and platform terms of service in their jurisdiction.
+场景后监测48小时。保持联系，提供安慰。
+
+### 法律免责声明
+本技能仅供教育和娱乐目的。用户有责任遵守其所在地的所有适用法律和平台服务条款。

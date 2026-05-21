@@ -1,60 +1,60 @@
-# Book Source Master
+# 书源大师 (Book Source Master)
 
-## Description
-A comprehensive guide for writing and debugging book sources for the Legado Reader 3.0 app (also known as "阅读3.0"). Covers API-based and HTML-based sources, field mapping, troubleshooting, and key rotation strategies. Agent uses this to create book sources for any novel website.
+## 描述
+编写和调试 Legado 阅读3.0 App（"阅读3.0"）书源的全面指南。涵盖基于 API 和基于 HTML 的书源类型、字段映射、故障排除和密钥轮换策略。智能体使用此指南为任何小说网站创建书源。
 
-## Instructions
+## 指令
 
-### Step 1: Determine Data Source Type
+### 第一步：确定数据源类型
 
-**A. API-based (Preferred, Most Stable)** — Website returns data via JSON API.
+**A. API 型（推荐，最稳定）** — 网站通过 JSON API 返回数据。
 
-Identify by: F12 Developer Tools → Network → XHR/Fetch tab → look for JSON responses.
+识别方法：F12 开发者工具 → 网络 → XHR/Fetch 标签 → 查找 JSON 响应。
 
-Write using: `@js:JSON.parse(result)` to parse JSON.
+编写方法：使用 `@js:JSON.parse(result)` 解析 JSON。
 
-**B. HTML-based (Universal)** — Website returns HTML pages.
+**B. HTML 型（通用）** — 网站返回 HTML 页面。
 
-Identify by: View page source → look for book list HTML tags.
+识别方法：查看页面源代码 → 查找书籍列表的 HTML 标签。
 
-Write using: `@css:` selectors.
+编写方法：使用 `@css:` 选择器。
 
-### Step 2: Field Mapping Table
+### 第二步：字段映射表
 
 #### searchUrl
 ```
-API-type:  "https://api.example.com/search?q={{key}}&page=0"
-HTML-type: "https://site.com/search?q={{key}}"
+API 型： "https://api.example.com/search?q={{key}}&page=0"
+HTML 型："https://site.com/search?q={{key}}"
 ```
 
-`{{key}}` is automatically replaced by the app with the user's search keyword. Note: it's `{{key}}`, not `{key}`.
+`{{key}}` 由 App 自动替换为用户搜索的关键词。注意：是 `{{key}}`，不是 `{key}`。
 
-#### ruleSearch — Parse Search Results
+#### ruleSearch — 解析搜索结果
 
-| Field | API-type | HTML-type |
+| 字段 | API 型 | HTML 型 |
 |-------|----------|-----------|
-| `bookList` | `data.books` or `@js:` iterate | `@css:.book-item` |
-| `name` | field name (e.g. `title`) | `@css:.title@text` |
-| `author` | field name | `@css:.author@text` |
-| `bookUrl` | `@js:` construct URL | `@css:a@href` |
-| `coverUrl` | field name | `@css:img@src` |
-| `intro` | field name (optional) | optional |
+| `bookList` | `data.books` 或 `@js:` 迭代 | `@css:.book-item` |
+| `name` | 字段名（如 `title`） | `@css:.title@text` |
+| `author` | 字段名 | `@css:.author@text` |
+| `bookUrl` | `@js:` 构造 URL | `@css:a@href` |
+| `coverUrl` | 字段名 | `@css:img@src` |
+| `intro` | 字段名（可选） | 可选 |
 
-**bookUrl must be a complete URL.** Search results typically only have IDs:
+**bookUrl 必须是完整 URL。** 搜索结果通常只有 ID：
 
 ```json
 "bookList": "@js:var r=JSON.parse(result);var list=r.data.books;if(list){for(var i=0;i<list.length;i++){list[i].bookUrl='https://example.com/detail?id='+list[i].id}}JSON.stringify(list);",
 "bookUrl": "bookUrl"
 ```
 
-**bookUrlPattern** — fill with the characteristic string in bookUrl for matching:
+**bookUrlPattern** — 填写 bookUrl 中的特征字符串用于匹配：
 ```
-Example: "type=2", "book_id=", "/detail/"
+示例："type=2", "book_id=", "/detail/"
 ```
 
-#### ruleBookInfo — Book Details
+#### ruleBookInfo — 书籍详情
 
-API-type:
+API 型：
 ```json
 "ruleBookInfo": {
   "name": "@js:JSON.parse(result).data.book.title",
@@ -65,7 +65,7 @@ API-type:
 }
 ```
 
-HTML-type:
+HTML 型：
 ```json
 "ruleBookInfo": {
   "name": "@css:.book-title@text",
@@ -74,9 +74,9 @@ HTML-type:
 }
 ```
 
-#### ruleToc — Parse Table of Contents
+#### ruleToc — 解析目录
 
-Each chapter must have a complete content URL:
+每个章节必须有完整的内容 URL：
 
 ```json
 "ruleToc": {
@@ -86,116 +86,116 @@ Each chapter must have a complete content URL:
 }
 ```
 
-**Note:** Do not use `chapterUrl` as a field name (it's a Legado reserved word). Use `cUrl` instead.
+**注意：** 不要用 `chapterUrl` 作为字段名（这是 Legado 保留字）。请使用 `cUrl`。
 
-#### ruleContent — Parse Content
+#### ruleContent — 解析正文
 
-API-type:
+API 型：
 ```json
 "ruleContent": {
   "content": "@js:JSON.parse(result).data.content"
 }
 ```
 
-HTML-type:
+HTML 型：
 ```json
 "ruleContent": {
   "content": "@css:#content@textNodes"
 }
 ```
 
-Ad filtering (optional):
+广告过滤（可选）：
 ```json
 "ruleContent": {
   "content": "data.content",
-  "replaceRegex": "advertisement|promotion|sponsored"
+  "replaceRegex": "广告|推广|赞助"
 }
 ```
 
-#### exploreUrl — Category Discovery
+#### exploreUrl — 分类发现
 
-Pass search keywords in each category URL:
+在每个分类 URL 中传递搜索关键词：
 
 ```json
-"exploreUrl": "<js>\nvar list=[\n{\"title\":\"🔥 Recommended\",\"url\":\"https://example.com/search?key=Recommended\"},\n{\"title\":\"📖 Fantasy\",\"url\":\"https://example.com/search?key=Fantasy\"}\n];JSON.stringify(list);\n</js>"
+"exploreUrl": "<js>\nvar list=[\n{\"title\":\"🔥 推荐\",\"url\":\"https://example.com/search?key=推荐\"},\n{\"title\":\"📖 奇幻\",\"url\":\"https://example.com/search?key=奇幻\"}\n];JSON.stringify(list);\n</js>"
 ```
 
-Add `"enabledExplore": true` to enable.
+添加 `"enabledExplore": true` 启用。
 
-### Step 3: Key Rotation (For Rate-Limited APIs)
+### 第三步：密钥轮换（针对被限流的 API）
 
 ```json
 "searchUrl": "<js>var _keys=[\"KEY1\",\"KEY2\",\"KEY3\"];var _idx=java.getGlobal(\"key_idx\");if(_idx===null)_idx=0;else _idx=(_idx+1)%_keys.length;java.putGlobal(\"key_idx\",_idx);var ak=_keys[_idx];java.put('key',key);result='https://example.com/search?key='+ak+'&wd='+encodeURIComponent(key)+'&page=0'</js>"
 ```
 
-Add key rotation code to bookList, tocUrl, chapterList, content as well.
+同样在 bookList、tocUrl、chapterList、content 中加入密钥轮换代码。
 
-### Step 4: Troubleshooting
+### 第四步：故障排除
 
-| Symptom | Possible Cause | Solution |
+| 症状 | 可能原因 | 解决方案 |
 |---------|---------------|----------|
-| No search results | `{{key}}` typo | Check it's `{{key}}` not `{key}` |
-| Results found but blank detail | `bookUrl` incomplete | Construct full https:// URL in JS |
-| Blank detail page | `bookUrlPattern` mismatch | Check if char string appears in URL |
-| No table of contents | `tocUrl` incorrect | Check tocUrl in ruleBookInfo |
-| Chapters won't open | `cUrl` incomplete | Each chapter must be full URL |
-| Discovery page not showing | `enabledExplore` not set | Add `"enabledExplore": true` |
-| Key rate limit hit | Daily limit used up | Rotate key or wait until next day |
+| 搜索无结果 | `{{key}}` 拼写错误 | 检查是 `{{key}}` 不是 `{key}` |
+| 搜到结果但详情空白 | `bookUrl` 不完整 | 在 JS 中构造完整的 https:// 地址 |
+| 详情页空白 | `bookUrlPattern` 不匹配 | 检查特征字符串是否出现在 URL 中 |
+| 没有目录 | `tocUrl` 不正确 | 检查 ruleBookInfo 中的 tocUrl |
+| 章节打不开 | `cUrl` 不完整 | 每个章节必须是完整 URL |
+| 发现页不显示 | `enabledExplore` 未设置 | 添加 `"enabledExplore": true` |
+| 密钥被限流 | 日用量已用完 | 轮换密钥或等待次日 |
 
-### Step 5: Debugging
+### 第五步：调试
 
 ```bash
-# Test API with curl
+# 用 curl 测试 API
 curl "https://api.example.com/search?q=test"
 
-# Validate JSON syntax
-python3 -c "import json; json.load(open('source.json')); print('Valid')"
+# 验证 JSON 语法
+python3 -c "import json; json.load(open('source.json')); print('有效')"
 ```
 
-Browser F12 → Network → Search → Inspect request/response structure.
+浏览器 F12 → 网络 → 搜索 → 检查请求/响应结构。
 
-### Step 6: Complete Checklist
+### 第六步：完整检查清单
 
-- [ ] Determine data source (API or HTML)
-- [ ] Test all 4 endpoints with curl (search/detail/toc/content)
-- [ ] Write `searchUrl`
-- [ ] Write `ruleSearch` + JS to construct `bookUrl`
-- [ ] Write `bookUrlPattern`
-- [ ] Write `ruleBookInfo` + JS to construct `tocUrl`
-- [ ] Write `ruleToc` + JS to construct each `cUrl`
-- [ ] Write `ruleContent`
-- [ ] Optionally write `exploreUrl`
-- [ ] Validate JSON syntax with python3
-- [ ] Full chain test in Legado Reader 3.0
+- [ ] 确定数据源（API 或 HTML）
+- [ ] 用 curl 测试全部4个端点（搜索/详情/目录/正文）
+- [ ] 编写 `searchUrl`
+- [ ] 编写 `ruleSearch` + JS 构造 `bookUrl`
+- [ ] 编写 `bookUrlPattern`
+- [ ] 编写 `ruleBookInfo` + JS 构造 `tocUrl`
+- [ ] 编写 `ruleToc` + JS 构造每个 `cUrl`
+- [ ] 编写 `ruleContent`
+- [ ] 可选编写 `exploreUrl`
+- [ ] 用 python3 验证 JSON 语法
+- [ ] 在 Legado 阅读3.0 中完整链测试
 
-## Parameters
+## 参数
 
-| Parameter | Type | Required | Description |
+| 参数名 | 类型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| api_url | string | Yes | Base URL of the novel website API |
-| search_query | string | Depends | Search keyword for testing |
-| source_type | string | Yes | "api" or "html" |
-| use_key_rotation | boolean | No | Enable key rotation (default: false) |
-| api_keys | string[] | If rotation enabled | List of API keys |
+| api_url | string | 是 | 小说网站 API 的基础 URL |
+| search_query | string | 视情况 | 测试用的搜索关键词 |
+| source_type | string | 是 | "api" 或 "html" |
+| use_key_rotation | boolean | 否 | 启用密钥轮换（默认: false） |
+| api_keys | string[] | 启用轮换时 | API 密钥列表 |
 
-## Examples
+## 示例
 
-### API-based source for a novel website
+### 为小说网站创建 API 型书源
 ```
-User: "Create a book source for example.com"
-Agent: Follow Steps 1-6, testing each endpoint and generating the JSON source.
-```
-
-### Debugging an existing source
-```
-User: "My book source shows 'no results' when I search"
-Agent: Check `{{key}}` syntax → verify `bookUrlPattern` → test with curl → fix accordingly.
+用户："为 example.com 创建一个书源"
+智能体：按照步骤1-6，测试每个端点并生成 JSON 源。
 ```
 
-## Notes
-- Always use `cUrl` instead of `chapterUrl` (Legado reserved word conflict)
-- The `@js:` prefix uses the Legado JS engine, not browser/Node.js
-- For HTML sources, use `@css:` selectors; for API, use `@js:JSON.parse()`
-- Validate JSON syntax before importing into the app
-- Key rotation must be added to every `@js:` block that makes API calls
-- This guide is for the Legado Reader 3.0 app ecosystem only
+### 调试现有书源
+```
+用户："我的书源搜索时显示'无结果'"
+智能体：检查 `{{key}}` 语法 → 验证 `bookUrlPattern` → 用 curl 测试 → 相应修复。
+```
+
+## 备注
+- 始终使用 `cUrl` 而不是 `chapterUrl`（Legado 保留字冲突）
+- `@js:` 前缀使用 Legado JS 引擎，不是浏览器/Node.js
+- HTML 源使用 `@css:` 选择器；API 源使用 `@js:JSON.parse()`
+- 导入 App 前验证 JSON 语法
+- 密钥轮换必须添加到每个发起 API 调用的 `@js:` 块中
+- 本指南仅适用于 Legado 阅读3.0 App 生态系统
