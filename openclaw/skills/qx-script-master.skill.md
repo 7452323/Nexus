@@ -1277,3 +1277,123 @@ hostname = ad.example.com, api.example.com
 
 ---
 
+## 十、RevenueCat 4.x 订阅解锁（重要更新）
+
+### 10.1 RevenueCat SDK 特征识别
+
+RevenueCat 是 iOS App 最常用的第三方订阅管理 SDK。抓包时通过以下特征识别：
+
+```json
+// 请求头特征
+X-Platform: iOS
+X-Version: 4.x              // SDK 版本
+X-StoreKit2-Enabled: false  // StoreKit1 模式
+X-Client-Bundle-ID: com.example
+Authorization: Bearer appl_...  // RevenueCat 公钥
+
+// 响应头特征
+x-signature: ...  // SDK 4.x 新增响应签名验证
+x-revenuecat-etag: ...
+```
+
+常见 RevenueCat 域名：
+- `api.revenuecat.com`（主域名）
+- `api.rc-backup.com`（备用域名）
+
+### 10.2 RevenueCat 4.x 关键变化
+
+SDK 4.x 相比旧版增加了 `x-signature` 响应签名验证机制。**只改响应体不够**——SDK 会校验签名，body 改了但签名不对，SDK 直接拒绝并用缓存数据覆盖。
+
+**解决方案：双规则（body + header 两条规则指向同一个脚本）**
+
+```ini
+[MITM]
+hostname = api.revenuecat.com, api.rc-backup.com
+
+[rewrite_local]
+# 规则1: 改响应体 - 注入PRO权益
+^https?://api.(revenuecat|rc-backup).com/v1/.* url script-response-body https://raw.githubusercontent.com/7452323/QuantumultX/main/script/AppName.js
+
+# 规则2: 去签名头 - 否则SDK拒绝修改后的body
+^https?://api.(revenuecat|rc-backup).com/v1/.* url script-response-header https://raw.githubusercontent.com/7452323/QuantumultX/main/script/AppName.js
+```
+
+### 10.3 JavaScript 脚本模板
+
+```javascript
+// ==Header模式（script-response-header）==
+if (!$response.body) {
+  var h = $response.headers;
+  delete h['x-signature'];        // 去签名验证
+  delete h['etag'];               // 去缓存标签
+  delete h['x-revenuecat-etag'];
+  h['Cache-Control'] = 'no-cache'; // 强制重新拉取
+  $done({headers: h});
+  return;
+}
+
+// ==Body模式（script-response-body）==
+try {
+  var obj = JSON.parse($response.body);
+  var now = new Date().toISOString();
+
+  // 永久买断: expires_date = null
+  // 订阅制: expires_date = 未来日期
+  var pro = {
+    expires_date: null,
+    product_identifier: "product_id",
+    purchase_date: now
+  };
+
+  // 任何含 subscriber 的响应都注入
+  if (obj.subscriber) {
+    obj.subscriber.entitlements = { pro: pro };
+    obj.subscriber.subscriptions = { product_id: {
+      expires_date: null, period_type: "normal",
+      purchase_date: now, store: "app_store"
+    }};
+  }
+  // offerings 也注入保底（部分SDK版从offerings读权益）
+  if (obj.offerings) {
+    obj.subscriber = { entitlements: { pro: pro }, subscriptions: {} };
+  }
+
+  $done({body: JSON.stringify(obj)});
+} catch(e) { $done({}); }
+```
+
+### 10.4 RevenueCat 抓包关键字段解读
+
+| HAR字段 | 含义 | 用途 |
+|---------|------|------|
+| `X-Platform: iOS` | iOS平台 | 确认是Apple端订阅 |
+| `X-StoreKit2-Enabled: false` | 使用StoreKit1 | 依赖服务端验证，可MITM |
+| `X-Version: 4.x` | SDK版本号 | ≥4.x需要处理x-signature |
+| `Authorization: Bearer appl_...` | RevenueCat公钥 | 区分是RevenueCat请求 |
+| `x-signature` | 响应签名 | 必须删除否则body修改无效 |
+| `x-revenuecat-etag` | 响应缓存标签 | 删除强制走新数据 |
+| `$RCAnonymousID:xxx` | 匿名用户ID | 每个安装唯一 |
+| `X-Client-Bundle-ID` | App的Bundle ID | 确认目标App |
+| `product_entitlement_mapping` | 产品→权益映射 | 知道哪个product对应哪个entitlement |
+| `/v1/subscribers/{id}` | 订阅状态（核心） | 改这里返回PRO |
+| `/v1/subscribers/{id}/offerings` | 付费墙 | 注入subscriber保底 |
+| `/v1/receipts` | 收据验证 | "恢复购买"触发，注入PRO |
+
+### 10.5 永久买断 vs 订阅制
+
+| 类型 | expires_date | 特点 |
+|------|-------------|------|
+| 永久买断 | `null` | 一次付费永久使用，不续期 |
+| 订阅制 | `2099-12-31T23:59:59Z` | 定期扣费，有过期时间 |
+| 免费试用 | 同上（但 `period_type: "trial"`） | 限时免费体验 |
+
+### 10.6 常见问题
+
+**Q: 恢复购买成功，但下次启动又没了？**
+A: SDK启动时后台刷新订阅状态。如果MITM没拦截订阅刷新请求，返回的"无PRO"状态会覆盖缓存。方案：全API路径匹配 + 清掉etag/signature头。
+
+**Q: 抓包里没有 `/v1/subscribers/{id}` 请求？**
+A：SDK缓存了上次结果。杀掉app重开，或者卸载重装（首次启动必定请求）。
+
+**Q: Surge/Loon怎么配？**
+A：Surge用 `type=http-response`，Loon用 `http-response` 单条规则即可（两者都同时拦截body+header）。
