@@ -1,56 +1,45 @@
-[
-  {
-    "bookSourceComment": "UAA小说 - m.uaa002.com（无CF保护）\n\t搜索: /novel/list?searchType=1&keyword=关键词\n\t列表项: div.novel_item_2 → brief_box_2(书名+链接) / info_box(作者+题材)\n\t详情: h1书名 / div.brief_box简介 / div.info_box作者+题材 / div.catalog_box a目录\n\t正文: div.chapter_box\n",
-    "bookSourceGroup": "UAA",
-    "bookSourceName": "UAA小说",
-    "bookSourceUrl": "https://m.uaa002.com",
-    "bookSourceType": 0,
-    "enabled": true,
-    "enabledCookieJar": true,
-    "enabledExplore": true,
-    "exploreUrl": "全部::/novel/list?searchType=1&sort=2&page={{page}}\n都市::/novel/list?searchType=1&category=都市&sort=2&page={{page}}\n校园::/novel/list?searchType=1&category=校园&sort=2&page={{page}}\n玄幻::/novel/list?searchType=1&category=玄幻&sort=2&page={{page}}\n武侠::/novel/list?searchType=1&category=武侠&sort=2&page={{page}}\n历史::/novel/list?searchType=1&category=历史&sort=2&page={{page}}\n科幻::/novel/list?searchType=1&category=科幻&sort=2&page={{page}}\n排行榜::/novel/rank?type=1&page={{page}}",
-    "ruleExplore": {
-      "author": "@css:div.brief_box_2 div.info_box:contains(作者)@text",
-      "bookList": "@css:div.novel_item_2",
-      "bookUrl": "@css:div.brief_box_2 a@href",
-      "coverUrl": "",
-      "intro": "@css:div.brief_box_2 div.info_box:contains(简介)@text",
-      "kind": "@css:div.brief_box_2 div.info_box:contains(题材)@text",
-      "lastChapter": "@css:div.update_state_box@text",
-      "name": "@css:div.brief_box_2 a@text"
-    },
-    "ruleSearch": {
-      "author": "@css:div.brief_box_2 div.info_box:contains(作者)@text",
-      "bookList": "@css:div.novel_item_2",
-      "bookUrl": "@css:div.brief_box_2 a@href",
-      "coverUrl": "",
-      "intro": "@css:div.brief_box_2 div.info_box:contains(简介)@text",
-      "kind": "@css:div.brief_box_2 div.info_box:contains(题材)@text",
-      "lastChapter": "@css:div.update_state_box@text",
-      "name": "@css:div.brief_box_2 a@text"
-    },
-    "searchUrl": "/novel/list?searchType=1&keyword={{key}}&sort=2&page={{page}}",
-    "ruleBookInfo": {
-      "author": "@css:div.info_box div.info_box:contains(作者)@text##作者：",
-      "coverUrl": "",
-      "intro": "@css:div.brief_box@text||@css:div.detail_box@text",
-      "kind": "@css:div.info_box div.info_box:contains(题材)@text##题材：",
-      "lastChapter": "@css:div.update_state_box@text",
-      "name": "@css:h1@text",
-      "tocUrl": ""
-    },
-    "ruleToc": {
-      "chapterList": "@css:div.catalog_box a",
-      "chapterName": "text",
-      "chapterUrl": "href",
-      "nextTocUrl": ""
-    },
-    "ruleContent": {
-      "content": "@css:div.chapter_box@textNodes",
-      "nextContentUrl": "text.下一章@href||@css:a:contains(下一章)@href",
-      "replaceRegex": "##UAA.COM|有爱爱|uaa\\.com"
-    },
-    "ruleReview": {},
-    "weight": 0
-  }
-]
+{
+  "bookSourceGroup": "有爱爱/UAA",
+  "bookSourceName": "UAA小说",
+  "bookSourceUrl": "https://www.uaa002.com",
+  "bookSourceType": 0,
+  "enabled": true,
+  "enabledExplore": true,
+  "enabledCookieJar": true,
+  "loginUrl": "https://www.uaa002.com",
+  "loginUi": "登录",
+  "loginCheckJs": "store.get('user')!==null",
+  "header": "{\n  \"User-Agent\": \"Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.230 Mobile Safari/537.36\",\n  \"Referer\": \"https://www.uaa002.com\"\n}",
+  "searchUrl": "/novel/list,{\"method\":\"POST\",\"body\":\"keyword={{key}}&page={{page}}\"}",
+  "ruleSearch": {
+    "bookList": "@css:div.novel_item_2",
+    "name": "@css:div.brief_box_2 a@text",
+    "author": "@css:div.info_box:contains(作者)@text##作者：",
+    "coverUrl": "@css:img.cover@src",
+    "bookUrl": "@css:div.brief_box_2 a@href",
+    "kind": "@css:div.info_box a@text||@css:div.tag_box a@text",
+    "intro": "@css:div.brief_text@text",
+    "lastChapter": "@css:div.update_info:contains(最新)@text##最新："
+  },
+  "ruleBookInfo": {
+    "name": "@css:h1@text",
+    "author": "@css:div.head_box a[href*=\"/user/\"]@text||@css:div.brief_box:contains(作者)@text##作者：",
+    "coverUrl": "@css:img[alt*=\"封面\"]@src||@css:img.cover@src",
+    "intro": "@css:div.content_text@text||@css:div.brief_box p@text||@css:div.desc_box@text",
+    "kind": "@css:div.tag_box a@text",
+    "lastChapter": "@css:div.update_info@text",
+    "tocUrl": ""
+  },
+  "ruleToc": {
+    "chapterList": "@css:div.catalog_box a",
+    "chapterName": "text",
+    "chapterUrl": "href",
+    "isVip": "@css:span.vip@text||@css:span:contains(VIP)@text||@css:span:contains(会员)@text"
+  },
+  "ruleContent": {
+    "content": "@css:div.chapter_box div.article div.line@textNodes",
+    "nextContentUrl": "text.下一章@href||@css:a:contains(下一章)@href",
+    "replaceRegex": "##"
+  },
+  "exploreUrl": "全部小说::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=1&page={{page}}\"}\n小说排行榜::/novel/rank?page={{page}}\n原创首发::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=2&page={{page}}\"}\n玄幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=玄幻&page={{page}}\"}\n都市::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=都市&page={{page}}\"}\n穿越::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=穿越&page={{page}}\"}\n言情::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=言情&page={{page}}\"}\n校园::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=校园&page={{page}}\"}\n奇幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=奇幻&page={{page}}\"}"
+}
