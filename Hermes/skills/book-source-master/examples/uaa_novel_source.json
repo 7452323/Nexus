@@ -39,7 +39,7 @@
   "ruleContent": {
     "content": "@css:div.article div.line:not(:has(span))@textNodes",
     "nextContentUrl": "@css:a:contains(下一章)@href",
-    "replaceRegex": "##"
+    "replaceRegex": "以下正文内容已隐藏.*|本网站永久域名.*|VPN.*|色情.*|成人.*|UAA热门.*|UAA地址.*|电报群.*|有爱爱每日.*|最佳浏览.*|欢迎您加入.*"
   },
   "exploreUrl": "全部小说::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=1&page={{page}}\"}\n小说排行榜::/novel/rank?page={{page}}\n原创首发::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=2&page={{page}}\"}\n玄幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=玄幻&page={{page}}\"}\n都市::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=都市&page={{page}}\"}\n穿越::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=穿越&page={{page}}\"}\n言情::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=言情&page={{page}}\"}\n校园::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=校园&page={{page}}\"}\n奇幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=奇幻&page={{page}}\"}"
 }
