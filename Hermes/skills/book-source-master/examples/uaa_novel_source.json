@@ -8,7 +8,6 @@
   "enabledCookieJar": true,
   "loginUrl": "https://m.uaa002.com",
   "loginUi": "登录",
-  "loginCheckJs": "document.cookie.includes('token')",
   "header": "{\n  \"User-Agent\": \"Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.230 Mobile Safari/537.36\",\n  \"Referer\": \"https://m.uaa002.com\"\n}",
   "searchUrl": "/novel/list,{\"method\":\"POST\",\"body\":\"keyword={{key}}&page={{page}}\"}",
   "ruleSearch": {
