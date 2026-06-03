@@ -1,12 +1,11 @@
-# Hermes Skills
+# Hermes 技能集合
 
-QX/Surge/Loon 生态脚本编写知识，基于 46 个开源项目（https://github.com/stars/7452323/lists/quantumx-surge-loon）的经验总结。
+本目录包含从 OpenClaw 迁移并合并到 Hermes Agent 格式的技能。
 
-## 技能清单
+## 技能列表
 
-| 技能 | 描述 |
-|------|------|
-| `qx-script-master` | QX/Surge/Loon 全能脚本编写 — 去广告三大流派、18+实战模式、46项目索引 |
-| `cross-platform-proxy-scripting` | 跨平台适配层 + Env.js + 模块互转 |
-
-不含任何逆向工程相关内容。
+| 技能 | 说明 | 版本 | 来源 |
+|------|------|------|------|
+| book-source-master | Legado 阅读3.0 书源编写 | v3.0 | OpenClaw + Yiove |
+| cross-platform-proxy-scripting | 跨平台代理脚本编写 | - | - |
+| qx-script-master | QuantumultX 脚本编写 | - | - |
