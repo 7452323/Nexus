@@ -47,7 +47,7 @@
     "nextTocUrl": ""
   },
   "ruleContent": {
-    "content": "@css:div#content@textNodes",
+    "content": "@css:div.chaptercontent-34e68100@textNodes||@css:div.panel-body.chaptercontent-34e68100@html||@css:div#content@html",
     "nextContentUrl": "text.下一章@href||@css:a:has(span.glyphicon-forward)@href",
     "replaceRegex": "##加书签|69书吧|一秒记住.*69shu|请收藏本站|www\\.69shu"
   },
