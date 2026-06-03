@@ -37,7 +37,7 @@
     "isVip": "@css:span.vip@text||@css:span:contains(VIP)@text||@css:span:contains(会员)@text"
   },
   "ruleContent": {
-    "content": "@css:div.chapter_box div.article div.line@textNodes",
+    "content": "@js:(()=>{var w=getWebView();w.loadUrl('{{baseUrl}}');try{java.lang.Thread.sleep(2000)}catch(e){}var r=w.runJs({code:'(function(){var a=document.createElement(\"div\");a.innerHTML=document.querySelector(\"div.article\")?document.querySelector(\"div.article\").outerHTML:\"\";var l=a.querySelectorAll(\"div.line\");var txt=[];for(var i=0;i<l.length;i++){var t=l[i].textContent.trim();if(t&&t.indexOf(\"以下正文内容已隐藏\")===-1&&t.indexOf(\"本网站永久域名\")===-1&&t.indexOf(\"VPN\")===-1&&t.indexOf(\"热门\")===-1&&t.indexOf(\"色情\")===-1&&t.indexOf(\"成人网\")===-1&&t.indexOf(\"UAA\")!==0){txt.push(t)}}return txt.join(\"\\n\")})()'});return r})()",
     "nextContentUrl": "text.下一章@href||@css:a:contains(下一章)@href",
     "replaceRegex": "##"
   },
