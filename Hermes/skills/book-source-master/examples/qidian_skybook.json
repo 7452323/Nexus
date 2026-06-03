@@ -1,0 +1,46 @@
+[
+  {
+    "bookSourceComment": "起点小说中转书源\n\t后端: https://no.skybook.qzz.io\n\t数据来源: 起点中文网（通过skybook中转API）\n\t特点: 搜索结果已含完整详情信息（封面/简介/分类/字数）\n\t      详情页用搜索结果过滤，不需要额外detail接口\n",
+    "bookSourceGroup": "🌙 ΑΡI,起点",
+    "bookSourceName": "🌙 起点中文",
+    "bookSourceUrl": "起点-skybook",
+    "bookSourceType": 0,
+    "enabled": true,
+    "enabledCookieJar": true,
+    "enabledExplore": true,
+    "exploreUrl": "玄幻::@js:buildRequest(backend + '/69/search?key=玄幻&page={{page}}')\n仙侠::@js:buildRequest(backend + '/69/search?key=仙侠&page={{page}}')\n都市::@js:buildRequest(backend + '/69/search?key=都市&page={{page}}')\n历史::@js:buildRequest(backend + '/69/search?key=历史&page={{page}}')\n游戏::@js:buildRequest(backend + '/69/search?key=游戏&page={{page}}')\n科幻::@js:buildRequest(backend + '/69/search?key=科幻&page={{page}}')\n灵异::@js:buildRequest(backend + '/69/search?key=灵异&page={{page}}')\n言情::@js:buildRequest(backend + '/69/search?key=言情&page={{page}}')\n武侠::@js:buildRequest(backend + '/69/search?key=武侠&page={{page}}')\n军事::@js:buildRequest(backend + '/69/search?key=军事&page={{page}}')\n悬疑::@js:buildRequest(backend + '/69/search?key=悬疑&page={{page}}')",
+    "jsLib": "const backend = 'https://no.skybook.qzz.io';\nfunction buildRequest(url) { return url; }",
+    "ruleBookInfo": {
+      "author": "$.author",
+      "coverUrl": "$.imgUrl",
+      "init": "<js>\n// baseUrl = data:;base64,{b64},{...}\n// 从搜索结果重新按articleid过滤详情\nvar bid = java.base64Decode(baseUrl.split(',')[1]);\nvar name = java.getString('$.articlename', result);\nresult = java.ajax(buildRequest(backend + '/69/search?key=' + encodeURIComponent(name) + '&page=1'));\nvar list = JSON.parse(result).list;\nfor (var i = 0; i < list.length; i++) {\n  if (list[i].articleid == Number(bid)) {\n    result = JSON.stringify(list[i]);\n    break;\n  }\n}\n</js>",
+      "intro": "$.introDes",
+      "kind": "$.sortName",
+      "lastChapter": "$.lastchapter",
+      "name": "$.articlename",
+      "tocUrl": "@js:\n'data:;base64,' + java.base64Encode(bid) + ',{\"type\":\"my69t\"}'",
+      "wordCount": "$.wordsWan@js:result + '万字'"
+    },
+    "ruleContent": {
+      "content": "@js:\nvar parts = java.hexDecodeToString(result).split('/');\nvar bid = parts[0];\nvar cid = parts[1];\nresult = java.ajax(buildRequest(backend + '/69/content?book_id=' + bid + '&chapter_id=' + cid));\nJSON.parse(result).data;",
+      "replaceRegex": "##新..书吧|吧书69新|\\(\\)|^第.{0,8}章.*|\\(本章完\\)|阅读.*[MМ]|教你记.*\\.com>|注意.*69书吧|请收藏.*69shu"
+    },
+    "ruleSearch": {
+      "author": "$.author",
+      "bookList": "$.list",
+      "bookUrl": "$.articleid\n@js:\n'data:;base64,' + java.base64Encode(result) + ',{\"type\":\"my69s\"}'",
+      "coverUrl": "$.imgUrl",
+      "intro": "$.intro",
+      "kind": "$.keywords",
+      "lastChapter": "$.lastchapter",
+      "name": "$.articlename",
+      "wordCount": "$.words"
+    },
+    "ruleToc": {
+      "chapterList": "<js>\nvar bid = java.base64Decode(baseUrl.split(',')[1]);\nresult = java.ajax(buildRequest(backend + '/69/catalog?book_id=' + bid));\nJSON.parse(result).list.reduce(function(arr, item) {\n    var title = item.chaptername;\n    var url = item.articleid + '/' + item.chapterid;\n    arr.push(JSON.stringify({\n        title: title,\n        url: 'data:;base64,' + java.base64Encode(url) + ',{\"type\":\"my69c\"}'\n    }));\n    return arr;\n}, []);\n</js>",
+      "chapterName": "$.title",
+      "chapterUrl": "$.url"
+    },
+    "searchUrl": "@js:\nbuildRequest(backend + '/69/search?key=' + encodeURIComponent(key) + '&page=' + (page || 1))"
+  }
+]
