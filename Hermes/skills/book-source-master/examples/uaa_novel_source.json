@@ -1,15 +1,15 @@
 {
   "bookSourceGroup": "有爱爱/UAA",
   "bookSourceName": "UAA小说",
-  "bookSourceUrl": "https://www.uaa002.com",
+  "bookSourceUrl": "https://m.uaa002.com",
   "bookSourceType": 0,
   "enabled": true,
   "enabledExplore": true,
   "enabledCookieJar": true,
-  "loginUrl": "https://www.uaa002.com",
+  "loginUrl": "https://m.uaa002.com",
   "loginUi": "登录",
   "loginCheckJs": "store.get('user')!==null",
-  "header": "{\n  \"User-Agent\": \"Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.230 Mobile Safari/537.36\",\n  \"Referer\": \"https://www.uaa002.com\"\n}",
+  "header": "{\n  \"User-Agent\": \"Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.230 Mobile Safari/537.36\",\n  \"Referer\": \"https://m.uaa002.com\"\n}",
   "searchUrl": "/novel/list,{\"method\":\"POST\",\"body\":\"keyword={{key}}&page={{page}}\"}",
   "ruleSearch": {
     "bookList": "@css:div.novel_item_2",
