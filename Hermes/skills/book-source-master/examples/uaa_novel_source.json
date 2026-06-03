@@ -1,45 +1,43 @@
 [
   {
-    "bookSourceComment": "UAA小说 - m.uaa002.com\n\t纯HTML书源，m站无Cloudflare保护\n\t正文在 div.chapter_box 里（包含标题和内容）\n\t详情页目录在 div.catalog_box a\n\t注意: 部分章节需要登录VIP付费\n",
-    "bookSourceGroup": "🔞UAA",
-    "bookSourceName": "🔞 UAA小说",
+    "bookSourceComment": "UAA小说 - m.uaa002.com（无CF保护）\n\t搜索: /novel/list?searchType=1&keyword=关键词\n\t列表项: div.novel_item_2 → brief_box_2(书名+链接) / info_box(作者+题材)\n\t详情: h1书名 / div.brief_box简介 / div.info_box作者+题材 / div.catalog_box a目录\n\t正文: div.chapter_box\n",
+    "bookSourceGroup": "UAA",
+    "bookSourceName": "UAA小说",
     "bookSourceUrl": "https://m.uaa002.com",
     "bookSourceType": 0,
     "enabled": true,
     "enabledCookieJar": true,
     "enabledExplore": true,
-    "exploreUrl": "全部小说::/novel/list?searchType=1&sort=2&page={{page}}\n都市::/novel/list?searchType=1&category=都市&sort=2&page={{page}}\n校园::/novel/list?searchType=1&category=校园&sort=2&page={{page}}\n乱伦::/novel/list?searchType=1&category=乱伦&sort=2&page={{page}}\n玄幻::/novel/list?searchType=1&category=玄幻&sort=2&page={{page}}\n系统::/novel/list?searchType=1&category=系统&sort=2&page={{page}}\n穿越::/novel/list?searchType=1&category=穿越&sort=2&page={{page}}\n武侠::/novel/list?searchType=1&category=武侠&sort=2&page={{page}}\n奇幻::/novel/list?searchType=1&category=奇幻&sort=2&page={{page}}\n乡村::/novel/list?searchType=1&category=乡村&sort=2&page={{page}}\n历史::/novel/list?searchType=1&category=历史&sort=2&page={{page}}\n明星::/novel/list?searchType=1&category=明星&sort=2&page={{page}}\n科幻::/novel/list?searchType=1&category=科幻&sort=2&page={{page}}\n同人::/novel/list?searchType=1&category=同人&sort=2&page={{page}}\n排行榜::/novel/rank?type=1&page={{page}}",
+    "exploreUrl": "全部::/novel/list?searchType=1&sort=2&page={{page}}\n都市::/novel/list?searchType=1&category=都市&sort=2&page={{page}}\n校园::/novel/list?searchType=1&category=校园&sort=2&page={{page}}\n玄幻::/novel/list?searchType=1&category=玄幻&sort=2&page={{page}}\n武侠::/novel/list?searchType=1&category=武侠&sort=2&page={{page}}\n历史::/novel/list?searchType=1&category=历史&sort=2&page={{page}}\n科幻::/novel/list?searchType=1&category=科幻&sort=2&page={{page}}\n排行榜::/novel/rank?type=1&page={{page}}",
     "ruleExplore": {
-      "author": "@css:div.novel_list_r a@text||@css:div.novel_list_r@text",
-      "bookList": "@css:div.novel_list_box",
-      "bookUrl": "@css:div.novel_list_r a@href",
+      "author": "@css:div.brief_box_2 div.info_box:contains(作者)@text",
+      "bookList": "@css:div.novel_item_2",
+      "bookUrl": "@css:div.brief_box_2 a@href",
       "coverUrl": "",
-      "intro": "@css:div.novel_list_r p@text",
-      "kind": "@css:a.tag@text",
-      "lastChapter": "@css:div.novel_list_r span:contains(最新)~span@text",
-      "name": "@css:div.novel_list_r a@text",
-      "wordCount": ""
+      "intro": "@css:div.brief_box_2 div.info_box:contains(简介)@text",
+      "kind": "@css:div.brief_box_2 div.info_box:contains(题材)@text",
+      "lastChapter": "@css:div.update_state_box@text",
+      "name": "@css:div.brief_box_2 a@text"
     },
     "ruleSearch": {
-      "author": "@css:div.novel_list_r a@text||@css:div.novel_list_r@text",
-      "bookList": "@css:div.novel_list_box",
-      "bookUrl": "@css:div.novel_list_r a@href",
+      "author": "@css:div.brief_box_2 div.info_box:contains(作者)@text",
+      "bookList": "@css:div.novel_item_2",
+      "bookUrl": "@css:div.brief_box_2 a@href",
       "coverUrl": "",
-      "intro": "@css:div.novel_list_r p@text",
-      "kind": "@css:a.tag@text",
-      "lastChapter": "@css:div.novel_list_r span:contains(最新)~span@text",
-      "name": "@css:div.novel_list_r a@text"
+      "intro": "@css:div.brief_box_2 div.info_box:contains(简介)@text",
+      "kind": "@css:div.brief_box_2 div.info_box:contains(题材)@text",
+      "lastChapter": "@css:div.update_state_box@text",
+      "name": "@css:div.brief_box_2 a@text"
     },
-    "searchUrl": "/novel/list?keyword={{key}}&searchType=1&sort=2&page={{page}}",
+    "searchUrl": "/novel/list?searchType=1&keyword={{key}}&sort=2&page={{page}}",
     "ruleBookInfo": {
-      "author": "@css:div.info_box div.novel_info_author||@css:div.info_box@text",
+      "author": "@css:div.info_box div.info_box:contains(作者)@text##作者：",
       "coverUrl": "",
-      "intro": "@css:div.detail_box@text",
-      "kind": "@css:span.tag@text",
-      "lastChapter": "@css:div.update_state_box~div.item a@text||@css:div.item:contains(最新) a@text",
-      "name": "@css:div.info_box div.title_box@text||@css:div.info_box h1@text",
-      "tocUrl": "",
-      "wordCount": ""
+      "intro": "@css:div.brief_box@text||@css:div.detail_box@text",
+      "kind": "@css:div.info_box div.info_box:contains(题材)@text##题材：",
+      "lastChapter": "@css:div.update_state_box@text",
+      "name": "@css:h1@text",
+      "tocUrl": ""
     },
     "ruleToc": {
       "chapterList": "@css:div.catalog_box a",
@@ -48,9 +46,9 @@
       "nextTocUrl": ""
     },
     "ruleContent": {
-      "content": "@css:div.chapter_box@textNodes||@css:div.chapter_box@html",
+      "content": "@css:div.chapter_box@textNodes",
       "nextContentUrl": "text.下一章@href||@css:a:contains(下一章)@href",
-      "replaceRegex": "##小说.*UAA|有爱爱.*uaa|版权.*"
+      "replaceRegex": "##UAA.COM|有爱爱|uaa\\.com"
     },
     "ruleReview": {},
     "weight": 0
