@@ -1,0 +1,55 @@
+{
+  "bookSourceComment": "69书吧 - 纯HTML书源\n\t注意: 搜索需要验证码(防爬)，无法直接搜索。\n\t解决: 该书源通过分类/排行榜/全本页浏览书籍。\n\t搜索时自动跳转到全部分类页作为搜索结果。\n",
+  "bookSourceGroup": "小说",
+  "bookSourceName": "69书吧",
+  "bookSourceUrl": "https://www.69shu.xyz",
+  "bookSourceType": 0,
+  "enabled": true,
+  "enabledCookieJar": true,
+  "enabledExplore": true,
+  "exploreUrl": "玄幻::/sort/xuanhuan/{{page}}.html\n仙侠::/sort/xianxia/{{page}}.html\n都市::/sort/dushi/{{page}}.html\n历史::/sort/lishi/{{page}}.html\n游戏::/sort/youxi/{{page}}.html\n科幻::/sort/kehuan/{{page}}.html\n灵异::/sort/kongbu/{{page}}.html\n言情::/sort/nvsheng/{{page}}.html\n其它::/sort/qita/{{page}}.html\n全本::/full/all/{{page}}.html",
+  "ruleExplore": {
+    "author": "@css:div.author@text",
+    "bookList": "@css:div.book-coverlist",
+    "bookUrl": "@css:a.cover@href",
+    "coverUrl": "@css:img.thumbnail@src",
+    "intro": "@css:div.intro@text",
+    "kind": "@css:span.label-info@text",
+    "lastChapter": "",
+    "name": "@css:h4.name a@text",
+    "wordCount": "@css:span.label-default@text"
+  },
+  "searchUrl": "@js:\n// 网站搜索需验证码 (POST /search 带 captcha)，无法直搜\n// 搜索时返回分类页提示用户浏览\nresult = 'https://www.69shu.xyz/sort/all/1.html';",
+  "ruleSearch": {
+    "author": "@css:div.author@text",
+    "bookList": "@css:div.book-coverlist",
+    "bookUrl": "@css:a.cover@href",
+    "coverUrl": "@css:img.thumbnail@src",
+    "intro": "@css:div.intro@text",
+    "kind": "@css:span.label-info@text",
+    "lastChapter": "",
+    "name": "@css:h4.name a@text",
+    "wordCount": "@css:span.label-default@text"
+  },
+  "ruleBookInfo": {
+    "name": "@css:h1.name@text",
+    "author": "@css:a.btn-info@text##^[\\s]*",
+    "coverUrl": "@css:div.cover img@src",
+    "kind": "@css:span.label-info@text",
+    "intro": "@css:p.intro-34e68100@html##<strong>[\\s\\S]*?</strong>",
+    "lastChapter": "@css:span.more@text",
+    "tocUrl": "@css:a.btn-primary@href"
+  },
+  "ruleToc": {
+    "chapterList": "@css:dd.chapter-34e68100 a",
+    "chapterName": "text",
+    "chapterUrl": "href",
+    "nextTocUrl": ""
+  },
+  "ruleContent": {
+    "content": "@css:div#content@textNodes",
+    "nextContentUrl": "text.下一章@href||@css:a:has(span.glyphicon-forward)@href",
+    "replaceRegex": "##加书签|69书吧|一秒记住.*69shu|请收藏本站|www\\.69shu"
+  },
+  "weight": 0
+}
