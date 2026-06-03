@@ -33,7 +33,7 @@
   "ruleToc": {
     "chapterList": "@css:div.catalog_box a[href*=\"/novel/chapter\"]",
     "chapterName": "text",
-    "chapterUrl": "href",
+    "chapterUrl": "@href",
     "isVip": "@css:span.vip@text||@css:span:contains(VIP)@text||@css:span:contains(会员)@text"
   },
   "ruleContent": {
