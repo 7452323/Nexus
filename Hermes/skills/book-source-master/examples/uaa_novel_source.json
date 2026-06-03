@@ -37,8 +37,8 @@
     "isVip": "@css:span.vip@text||@css:span:contains(VIP)@text||@css:span:contains(会员)@text"
   },
   "ruleContent": {
-    "content": "@js:(()=>{var w=getWebView();w.loadUrl('{{baseUrl}}');try{java.lang.Thread.sleep(2000)}catch(e){}var r=w.runJs({code:'(function(){var a=document.createElement(\"div\");a.innerHTML=document.querySelector(\"div.article\")?document.querySelector(\"div.article\").outerHTML:\"\";var l=a.querySelectorAll(\"div.line\");var txt=[];for(var i=0;i<l.length;i++){var t=l[i].textContent.trim();if(t&&t.indexOf(\"以下正文内容已隐藏\")===-1&&t.indexOf(\"本网站永久域名\")===-1&&t.indexOf(\"VPN\")===-1&&t.indexOf(\"热门\")===-1&&t.indexOf(\"色情\")===-1&&t.indexOf(\"成人网\")===-1&&t.indexOf(\"UAA\")!==0){txt.push(t)}}return txt.join(\"\\n\")})()'});return r})()",
-    "nextContentUrl": "text.下一章@href||@css:a:contains(下一章)@href",
+    "content": "@css:div.article div.line:not(:has(span))@textNodes",
+    "nextContentUrl": "@css:a:contains(下一章)@href",
     "replaceRegex": "##"
   },
   "exploreUrl": "全部小说::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=1&page={{page}}\"}\n小说排行榜::/novel/rank?page={{page}}\n原创首发::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=&searchType=2&page={{page}}\"}\n玄幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=玄幻&page={{page}}\"}\n都市::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=都市&page={{page}}\"}\n穿越::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=穿越&page={{page}}\"}\n言情::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=言情&page={{page}}\"}\n校园::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=校园&page={{page}}\"}\n奇幻::/novel/list,{\"method\":\"POST\",\"body\":\"keyword=奇幻&page={{page}}\"}"
