@@ -1,7 +1,7 @@
 ---
 name: qx-script-master
 description: "Quantumult X / Surge / Loon 全能脚本编写技能。覆盖 5 大脚本类型：Unlock（响应体/分路径/全替换）、Checkin（单账号/多账户/持久化）、Cookie 采集、去广告、面板工具。含 HAR 解析工作流、多平台适配层、Env.js 框架集成、18 种常见模式。"
-author: 7452323 (converted from OpenClaw)
+version: 3.0.0
 version: 3.0.0
 tags: [QuantumultX, Surge, Loon, unlock, checkin, cookie, adblock, panel, Env.js, proxy]
 ---
