@@ -844,6 +844,83 @@ hostname = api.example.com, stats.example.com
 
 ---
 
+## 十一、URL Scheme 远程操作
+
+通过 URL Scheme 实现配置导入和资源添加：
+
+```
+quantumult-x:///update-configuration?remote-resource=url-encoded-json
+quantumult-x:///add-resource?remote-resource=url-encoded-json
+quantumult-x:///ui?module=gallery&action=add
+```
+
+### 配置导入 JSON 格式
+
+```json
+{
+    "server_remote": [
+        "https://example.com/sub, tag=节点订阅, opt-parser=true, enabled=true"
+    ],
+    "filter_remote": [
+        "https://example.com/filter.list, tag=分流规则, force-policy=策略组名, enabled=true"
+    ],
+    "rewrite_remote": [
+        "https://example.com/rewrite.snippet, tag=重写规则, opt-parser=true, enabled=true"
+    ]
+}
+```
+
+### task-gallery + icon-gallery 格式
+
+```json
+// task-gallery (任务仓库)
+{
+  "name": "签到脚本集",
+  "description": "日常签到脚本",
+  "task": [
+    {"config": "0 8 * * * https://example.com/checkin.js, tag=签到, img-url=icon.png, enabled=true", "addons": "https://example.com/rewrite.snippet"}
+  ]
+}
+
+// icon-gallery (图标仓库)
+{
+  "name": "图标包",
+  "description": "策略组图标",
+  "icons": [
+    {"name": "Netflix", "url": "https://example.com/netflix.png"},
+    {"name": "YouTube", "url": "https://example.com/youtube.png"}
+  ]
+}
+```
+
+## 十二、资源解析器参数化 UI 协议
+
+> QX v1.5.6+ 支持
+
+资源解析器脚本可通过 `$parser` 对象声明 hash 参数，让 QX 客户端自动渲染编辑界面：
+
+```javascript
+// 解析器脚本中定义:
+$parser.hashSchema = function() {
+  return {
+    "param1": { label: "参数名", type: "text", placeholder: "输入..." },
+    "switch1": { label: "开关", type: "boolean", default: true }
+  };
+};
+
+$parser.hashToUI = function(hash) {
+  // hash: "key1=val1&key2=val2"
+  // 返回 UI 组件描述
+};
+
+$parser.uiToHash = function(values) {
+  // values: { "key1": "val1" }
+  // 返回 URL hash 字符串
+};
+```
+
+---
+
 ## 注意事项
 
 - 添加 rewrite 规则后，对应的域名必须添加到 [mitm] hostname 中
