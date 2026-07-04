@@ -360,10 +360,7 @@ const resBody = entry.response.content?.text;
 // Cookie采集 → request-header
 ```
 
-### 典型抓包发现→脚本生成
 
-| HAR 发现 | 脚本生成 |
-|----------|----------|
 | URL 包含 ad/ads/sponsor | `^url url reject` 或 `^url url reject-dict` |
 | 响应体 JSON 含 `"vip":0` | `^url url response-json "vip" replace "1"` |
 | 响应体 HTML 含广告元素 | `^url url response-body "ad-code" replace ""` |
@@ -482,7 +479,295 @@ $done({
 
 ---
 
-## 五、Task 详解
+
+## 五、跨平台适配框架（Env.js）
+
+代理脚本开发通常需要适配多平台（QX/Surge/Loon/Egern/Stash）。Env.js 是社区标准封装库，提供统一的存储、通知、HTTP 接口。
+
+### 平台 API 对照
+
+| 功能 | QX | Surge | Loon | Egern |
+|------|-----|-------|------|-------|
+| 持久化 | `$prefs.valueForKey` / `setValueForKey` | `$persistentStore.read` / `write` | `$persistentStore.read` / `write` | `$config.get` / `set` |
+| 通知 | `$notify(title, sub, body)` | `$notification.post(title, sub, body)` | `$notification.post(title, sub, body)` | `$notification(title, sub, body)` |
+| HTTP | `$task.fetch` | `$httpClient` | `$httpClient` | `$api.http` |
+| 完成 | `$done()` | `$done()` | `$done()` | `$done()` |
+
+### 三平台统一读写
+
+```javascript
+// 通用持久化
+function read(key) {
+    if (typeof $prefs !== 'undefined') return $prefs.valueForKey(key);
+    if (typeof $persistentStore !== 'undefined') return $persistentStore.read(key);
+    if (typeof $config !== 'undefined') return $config.get(key);
+    return null;
+}
+function write(val, key) {
+    if (typeof $prefs !== 'undefined') return $prefs.setValueForKey(val, key);
+    if (typeof $persistentStore !== 'undefined') return $persistentStore.write(val, key);
+    if (typeof $config !== 'undefined') return $config.set(key, val);
+    return false;
+}
+```
+
+### 通用通知封装
+
+```javascript
+function notify(title, subtitle, body) {
+    if (typeof $notify !== 'undefined') $notify(title, subtitle, body);
+    else if (typeof $notification !== 'undefined') {
+        if (typeof $notification.post !== 'undefined') $notification.post(title, subtitle, body);
+        else $notification(title, subtitle, body);
+    }
+}
+```
+
+### Env.js 骨架
+
+```javascript
+const $ = new Env('ScriptName');
+
+// 存储封装
+$.read = (key) => read(key);
+$.write = (val, key) => write(val, key);
+
+// 主逻辑
+!(async () => {
+    const result = await doWork();
+    $.msg('完成', '', result);
+    $.done();
+})();
+```
+
+
+
+## 六、常用脚本模式与模板
+
+### Unlock（解锁会员）
+适用于 JSON 响应体，常见字段：`vip`、`isVip`、`member`、`expireTime`、`isMember`、`isPaid`。
+
+```javascript
+const url = $request.url;
+if (url.includes('api/subscribe') || url.includes('api/vip/status')) {
+    let body = JSON.parse($response.body);
+    if (body.data) {
+        body.data.vip = true;
+        body.data.isVip = 1;
+        body.data.member = true;
+        body.data.expireTime = 3250368000000; // 2099-12-31
+        body.data.expireDate = "2099-12-31 23:59:59";
+    }
+    $done({ body: JSON.stringify(body) });
+} else {
+    $done({});
+}
+```
+
+### Checkin（自动签到）
+定时任务 + Token 持久化，每次签到后更新 Token。
+
+```javascript
+const $ = new Env('AutoCheckin');
+const TOKEN_KEY = 'checkin_token';
+const API_URL = 'https://api.example.com/checkin';
+
+!(async () => {
+    const token = $.read(TOKEN_KEY);
+    if (!token) { $notification.post('签到失败', '', 'Token 未配置'); $done(); return; }
+    const resp = await fetch(API_URL, { headers: { Authorization: token } });
+    const data = await resp.json();
+    if (data.code === 0) {
+        $.write(data.new_token || token, TOKEN_KEY);
+        $.msg('签到成功', '', data.message || '');
+    }
+    $done();
+})();
+```
+
+### Cookie 捕获
+```javascript
+const cookie = $request.headers['Cookie'] || $request.headers['cookie'];
+if (cookie && cookie.includes('sess')) {
+    $persistentStore.write(cookie, 'captured_cookie');
+    $notification.post('Cookie 捕获成功', '', cookie.slice(0, 50) + '...');
+}
+$done();
+```
+
+### 去广告（API 拦截）
+```javascript
+const url = $request.url;
+const adPatterns = [
+    'api/ad', 'api/ads', 'adservice', 'analytics', 'log/promotion',
+    'ads-config', 'commercial', 'sponsor'
+];
+if (adPatterns.some(p => url.includes(p))) {
+    $done({ status: 'HTTP/1.1 200 OK', body: '' });
+} else {
+    $done({});
+}
+```
+
+
+
+## 七、HAR Parser 自动化工具
+
+自动解析 HAR/ZIP 抓包文件，提取 API 端点、鉴权头、VIP 字段。
+
+### 用法
+```bash
+python3 har_parser.py <file.har|file.zip> [--save]
+python3 har_parser.py --url https://example.com/session.har
+```
+
+### 功能
+- 自动跳过静态资源（.js/.css/.png/.woff/.svg/.mp4）和 Analytics/Tracking/Ads
+- 高亮鉴权头：Cookie、Authorization、Token、X-Auth、X-Api-Key
+- 递归搜索 JSON 响应中的 VIP/订阅 字段（vip、isVip、member、subscription、expireTime、isPaid 等）
+- `--save` 导出 JSON 分析报告，供后续脚本编写参考
+
+### 集成到工作流
+```bash
+# 1. 抓包导出 HAR
+# 2. 自动分析
+python3 har_parser.py traffic.har --save
+# 3. 查看提取的 API + VIP 字段
+cat traffic.har.analysis.json
+# 4. 针对性编写解锁/签到脚本
+```
+
+### 源码（ har_parser.py ）
+```python
+#!/usr/bin/env python3
+"""
+HAR 解析工具 — 从抓包文件提取关键 API 接口
+
+支持:
+  .har 文件（HTTP Archive）
+  .zip 文件（部分抓包工具导出格式）
+  .json 文件（Mitmproxy/Surge 导出）
+
+用法:
+  python3 har_parser.py 抓包.har
+  python3 har_parser.py 抓包.zip
+  python3 har_parser.py 抓包.json
+  python3 har_parser.py 抓包.har --verbose   # 显示更多详情
+"""
+
+import json, sys, zipfile, os
+from io import StringIO
+
+def load_har(path):
+    """加载 HAR 文件，支持 .har/.zip/.json"""
+    data = None
+
+    # 如果是 .zip，尝试解压后读取 .har
+    if path.endswith('.zip'):
+        print(f"📦 检测到 ZIP 压缩包，解压中...")
+        with zipfile.ZipFile(path) as z:
+            # 找里面的 .har/.json 文件
+            har_files = [n for n in z.namelist() if n.endswith('.har') or n.endswith('.json')]
+            if not har_files:
+                print("❌ ZIP 内未找到 .har 或 .json 文件")
+                print(f"   文件列表: {z.namelist()}")
+                sys.exit(1)
+            target = har_files[0]
+            print(f"   读取: {target}")
+            data = json.loads(z.read(target))
+    else:
+        # 直接读 .har 或 .json
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+    return data
+
+def extract_entries(data):
+    """从 HAR 结构中提取 entries 列表"""
+    # 标准 HAR 格式
+    if 'log' in data and 'entries' in data['log']:
+        return data['log']['entries']
+    # Mitmproxy 格式
+    if 'entries' in data:
+        return data['entries']
+    # 直接是数组
+    if isinstance(data, list):
+        return data
+    print("⚠️  无法识别的格式，支持: HAR / Mitmproxy / 数组")
+    return []
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__)
+        sys.exit(1)
+
+    path = sys.argv[1]
+    verbose = '--verbose' in sys.argv
+
+    if not os.path.exists(path):
+        print(f"❌ 文件不存在: {path}")
+        sys.exit(1)
+
+    print(f"📂 文件: {path} ({os.path.getsize(path)/1024:.0f}KB)")
+    data = load_har(path)
+    entries = extract_entries(data)
+    print(f"📊 共 {len(entries)} 条请求\n")
+
+    # 过滤并显示关键 API
+    count = 0
+    for e in entries:
+        url = e['request']['url']
+        method = e['request']['method']
+        status = e['response']['status']
+        mime = e['response']['content'].get('mimeType', '')
+        size = e['response']['content'].get('size', 0)
+
+        # 过滤无关请求
+        skip_exts = ['.js', '.css', '.png', '.jpg', '.gif', '.svg', '.ico', '.woff', '.ttf']
+        if any(url.endswith(ext) for ext in skip_exts): continue
+        if any(k in url for k in ['analytics', 'log', 'stat', 'google', 'jpush', 'umeng']): continue
+        if size < 50: continue
+
+        count += 1
+        print(f"\n{'='*60}")
+        print(f"{'🟢' if status == 200 else '🟡'} {method} {status} | {size/1024:.1f}KB | {mime.split('/')[-1]}")
+        print(f"  URL: {url[:150]}")
+
+        # 显示请求头（关键字段）
+        headers = {h['name']: h['value'] for h in e['request'].get('headers', []) if h['name'] in ('Cookie', 'Authorization', 'User-Agent', 'X-Token', 'token')}
+        if headers:
+            for k, v in headers.items():
+                print(f"  {k}: {v[:80]}..." if len(v) > 80 else f"  {k}: {v}")
+
+        # 显示响应体字段
+        text = e['response']['content'].get('text', '')
+        if text and len(text) < 5000:
+            try:
+                obj = json.loads(text)
+                if isinstance(obj, dict):
+                    print(f"  响应字段: {', '.join(obj.keys())[:120]}")
+                    # 标记可疑的 VIP/订阅字段
+                    vip_keys = [k for k in obj.keys() if any(v in k.lower() for v in ['vip', 'vip_type', 'is_vip', 'svip', 'member', 'subscription', 'expire'])]
+                    if vip_keys:
+                        print(f"  🔑 可能需要的字段: {', '.join(vip_keys)}")
+                        for k in vip_keys[:3]:
+                            print(f"     {k} = {json.dumps(obj[k], ensure_ascii=False)[:60]}")
+            except:
+                pass
+
+        if not verbose and count >= 30:
+            print(f"\n⚠️  显示前 30 条，使用 --verbose 查看全部")
+            break
+
+    print(f"\n📋 共显示 {count} 条 API 请求")
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
+## 八、Task 详解
 
 ### 5.1 task_local 格式
 
@@ -671,7 +956,7 @@ $done({});
 
 ---
 
-## 六、去广告实战
+## 九、去广告实战
 
 ### 6.1 去广告流程
 
@@ -722,7 +1007,7 @@ hostname = *.googlesyndication.com, *.doubleclick.net, *.applovin.com, api.examp
 
 ---
 
-## 七、配置片段(snippet)
+## 十、配置片段(snippet)
 
 ### 7.1 snippet 文件格式
 
@@ -746,7 +1031,7 @@ rewrite.snippet, tag=自定义重写, enabled=true
 
 ---
 
-## 八、资源解析器
+## 十一、资源解析器
 
 ### 8.1 作用
 
@@ -769,7 +1054,7 @@ opt-parser=true
 
 ---
 
-## 九、持久化与 BoxJS
+## 十二、持久化与 BoxJS
 
 ### 9.1 QX 持久化
 
@@ -792,7 +1077,7 @@ https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.re
 
 ---
 
-## 十、完整脚本模板
+## 十三、完整脚本模板
 
 ### 模板1: 去重写广告(最简)
 
@@ -844,7 +1129,7 @@ hostname = api.example.com, stats.example.com
 
 ---
 
-## 十一、URL Scheme 远程操作
+## 十四、URL Scheme 远程操作
 
 通过 URL Scheme 实现配置导入和资源添加：
 
@@ -893,7 +1178,7 @@ quantumult-x:///ui?module=gallery&action=add
 }
 ```
 
-## 十二、资源解析器参数化 UI 协议
+## 十五、资源解析器参数化 UI 协议
 
 > QX v1.5.6+ 支持
 
