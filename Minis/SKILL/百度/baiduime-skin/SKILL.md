@@ -296,3 +296,51 @@ GearKey 解包格式参考：
 | ⭐3 | vancolate/baidu-input-skin-saved | 纯皮肤包 |
 | ⭐3 | bencn/BSkin | 制作工具 |
 | ⭐2 | ShenHongFei/baidu-ime-skin-moui-pure | 纯净皮 |
+
+## 十三、iOS 与 Android 双平台支持
+
+### 13.1 格式差异
+
+| | BDS (Android) | BDI (iOS) |
+|---|---|---|
+| 扩展名 | `.bds` | `.bdi` |
+| SupportPlatform | `A` | `I` |
+| 内部结构 | 相同 | 相同 |
+| 素材规范 | PNG + TIL | PNG + TIL |
+
+### 13.2 生成指定平台
+
+```bash
+# Android (.bds)
+python3 scripts/make_skin.py "MySkin" "Author" skin.bds --platform a
+
+# iOS (.bdi)
+python3 scripts/make_skin.py "MySkin" "Author" skin.bdi --platform i
+```
+
+### 13.3 Info.txt 标准格式
+
+**Android 版**：
+```
+Name=我的皮肤
+Style=Default
+SupportPlatform=A
+Author=作者名
+```
+
+**iOS 版**：
+```
+Name=我的皮肤
+Style=Default
+SupportPlatform=I
+Author=作者名
+```
+
+### 13.4 双平台打包
+
+```bash
+python3 scripts/make_skin.py "MySkin" "AK" skin.bds --platform a
+python3 scripts/make_skin.py "MySkin" "AK" skin.bdi --platform i
+```
+
+同时输出两个文件，分别安装到 Android / iPhone。
