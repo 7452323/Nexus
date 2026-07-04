@@ -1216,3 +1216,431 @@ $parser.uiToHash = function(values) {
 - 远程资源(server_remote/filter_remote/rewrite_remote)建议开启 `opt-parser=true` 以兼容各种格式
 - 配置片段 .snippet 放在 `iCloud/Quantumult X/Profiles/` 或 `Scripts/` 目录
 - 策略组的 `server-tag-regex` 支持正则匹配节点名进行筛选
+
+---
+
+## 十六、RevenueCat 4.x 订阅解锁（重要更新）
+
+### 十、RevenueCat 4.x 订阅（原始）
+
+### 10.1 RevenueCat SDK 特征识别
+
+RevenueCat 是 iOS App 最常用的第三方订阅管理 SDK。抓包时通过以下特征识别：
+
+```json
+// 请求头特征
+X-Platform: iOS
+X-Version: 4.x              // SDK 版本
+X-StoreKit2-Enabled: false  // StoreKit1 模式
+X-Client-Bundle-ID: com.example
+Authorization: Bearer appl_...  // RevenueCat 公钥
+
+// 响应头特征
+x-signature: ...  // SDK 4.x 新增响应签名验证
+x-revenuecat-etag: ...
+```
+
+常见 RevenueCat 域名：
+- `api.revenuecat.com`（主域名）
+- `api.rc-backup.com`（备用域名）
+
+### 10.2 RevenueCat 4.x 关键变化
+
+SDK 4.x 相比旧版增加了 `x-signature` 响应签名验证机制。**只改响应体不够**——SDK 会校验签名，body 改了但签名不对，SDK 直接拒绝并用缓存数据覆盖。
+
+**解决方案：双规则（body + header 两条规则指向同一个脚本）**
+
+```ini
+[MITM]
+hostname = api.revenuecat.com, api.rc-backup.com
+
+[rewrite_local]
+# 规则1: 改响应体 - 注入PRO权益
+^https?://api.(revenuecat|rc-backup).com/v1/.* url script-response-body https://raw.githubusercontent.com/7452323/QuantumultX/main/script/AppName.js
+
+# 规则2: 去签名头 - 否则SDK拒绝修改后的body
+^https?://api.(revenuecat|rc-backup).com/v1/.* url script-response-header https://raw.githubusercontent.com/7452323/QuantumultX/main/script/AppName.js
+```
+
+### 10.3 JavaScript 脚本模板
+
+```javascript
+// ==Header模式（script-response-header）==
+if (!$response.body) {
+  var h = $response.headers;
+  delete h['x-signature'];        // 去签名验证
+  delete h['etag'];               // 去缓存标签
+  delete h['x-revenuecat-etag'];
+  h['Cache-Control'] = 'no-cache'; // 强制重新拉取
+  $done({headers: h});
+  return;
+}
+
+// ==Body模式（script-response-body）==
+try {
+  var obj = JSON.parse($response.body);
+  var now = new Date().toISOString();
+
+  // 永久买断: expires_date = null
+  // 订阅制: expires_date = 未来日期
+  var pro = {
+    expires_date: null,
+    product_identifier: "product_id",
+    purchase_date: now
+  };
+
+  // 任何含 subscriber 的响应都注入
+  if (obj.subscriber) {
+    obj.subscriber.entitlements = { pro: pro };
+    obj.subscriber.subscriptions = { product_id: {
+      expires_date: null, period_type: "normal",
+      purchase_date: now, store: "app_store"
+    }};
+  }
+  // offerings 也注入保底（部分SDK版从offerings读权益）
+  if (obj.offerings) {
+    obj.subscriber = { entitlements: { pro: pro }, subscriptions: {} };
+  }
+
+  $done({body: JSON.stringify(obj)});
+} catch(e) { $done({}); }
+```
+
+### 10.4 RevenueCat 抓包关键字段解读
+
+| HAR字段 | 含义 | 用途 |
+|---------|------|------|
+| `X-Platform: iOS` | iOS平台 | 确认是Apple端订阅 |
+| `X-StoreKit2-Enabled: false` | 使用StoreKit1 | 依赖服务端验证，可MITM |
+| `X-Version: 4.x` | SDK版本号 | ≥4.x需要处理x-signature |
+| `Authorization: Bearer appl_...` | RevenueCat公钥 | 区分是RevenueCat请求 |
+| `x-signature` | 响应签名 | 必须删除否则body修改无效 |
+| `x-revenuecat-etag` | 响应缓存标签 | 删除强制走新数据 |
+| `$RCAnonymousID:xxx` | 匿名用户ID | 每个安装唯一 |
+| `X-Client-Bundle-ID` | App的Bundle ID | 确认目标App |
+| `product_entitlement_mapping` | 产品→权益映射 | 知道哪个product对应哪个entitlement |
+| `/v1/subscribers/{id}` | 订阅状态（核心） | 改这里返回PRO |
+| `/v1/subscribers/{id}/offerings` | 付费墙 | 注入subscriber保底 |
+| `/v1/receipts` | 收据验证 | "恢复购买"触发，注入PRO |
+
+### 10.5 永久买断 vs 订阅制
+
+| 类型 | expires_date | 特点 |
+|------|-------------|------|
+| 永久买断 | `null` | 一次付费永久使用，不续期 |
+| 订阅制 | `2099-12-31T23:59:59Z` | 定期扣费，有过期时间 |
+| 免费试用 | 同上（但 `period_type: "trial"`） | 限时免费体验 |
+
+### 10.6 常见问题
+
+**Q: 恢复购买成功，但下次启动又没了？**
+A: SDK启动时后台刷新订阅状态。如果MITM没拦截订阅刷新请求，返回的"无PRO"状态会覆盖缓存。方案：全API路径匹配 + 清掉etag/signature头。
+
+**Q: 抓包里没有 `/v1/subscribers/{id}` 请求？**
+A：SDK缓存了上次结果。杀掉app重开，或者卸载重装（首次启动必定请求）。
+
+**Q: Surge/Loon怎么配？**
+A：Surge用 `type=http-response`，Loon用 `http-response` 单条规则即可（两者都同时拦截body+header）。
+
+
+---
+
+## 十七、Surge 独有脚本类型
+
+### 十、Surge 独有类型（原始）
+
+Surge 除了 `http-request` / `http-response` / `cron` / `generic` 外，还有三种其他平台没有的脚本类型。
+
+### 10.1 `type=event` — 事件脚本
+
+当指定事件发生时触发。目前支持两种事件：
+
+**`network-changed` — 网络变化时触发：**
+```ini
+[Script]
+network-watch = type=event,event-name=network-changed,script-path=network.js
+```
+
+```javascript
+// network.js — 网络变化时通知
+$notification.post('网络切换', $network.wifi.ssid || '蜂窝网络', 
+  `DNS: ${$network.dns.join(', ')}`);
+$done();
+```
+
+**`notification` — 通知事件：**
+Surge 弹出通知时触发，脚本可以获取通知内容：
+```javascript
+// notification = type=event,event-name=notification,script-path=noti.js
+console.log($event.data);  // 通知数据
+$done();
+```
+
+### 10.2 `type=dns` — DNS 脚本
+
+自定义 DNS 响应，可以拦截/修改特定域名的解析结果：
+
+```ini
+[Script]
+dns-rules = type=dns,script-path=dns.js
+```
+
+```javascript
+// 拦截指定域名，返回自定义 IP
+if ($domain === 'ads.example.com') {
+  $done({ matched: true, address: '127.0.0.1', ttl: 600 });
+} else if ($domain === 'tracker.example.com') {
+  $done({ matched: true, drop: true });  // 直接丢弃
+} else {
+  $done({});  // 不处理，走正常 DNS
+}
+```
+
+参数说明：
+- `matched: true` — 匹配此规则
+- `address: 'IP'` — 返回自定义 IP（IPv4 或 IPv6）
+- `drop: true` — 丢弃该 DNS 查询
+- `ttl: 秒数` — 缓存时间
+
+### 10.3 `type=rule` — 规则脚本
+
+在 `[Rule]` 段中作为规则使用。可以动态决定是否匹配：
+
+```ini
+[Script]
+ssid-rule = type=rule,script-path=ssid-rule.js
+
+[Rule]
+SCRIPT,ssid-rule,ProxyA
+```
+
+```javascript
+// ssid-rule.js — 根据 WiFi SSID 决定是否走代理
+if ($network.wifi.ssid === 'MyHome') {
+  $done({ matched: false });  // 不匹配，继续下一条规则
+} else {
+  $done({ matched: true });   // 匹配，走 ProxyA
+}
+```
+
+可用的 `$request` 属性：
+```javascript
+$request.hostname     // 主机名
+$request.destPort     // 目标端口
+$request.processPath  // 进程路径
+$request.userAgent    // User-Agent
+$request.url          // 完整 URL
+$request.sourceIP     // 源 IP
+$request.dnsResult    // DNS 解析结果
+```
+
+### 10.4 `$network` — 网络状态对象
+
+Surge 独有（QX/Loon 均无）：
+
+```javascript
+// WiFi 信息
+$network.wifi.ssid;      // WiFi 名称
+$network.wifi.bssid;     // WiFi BSSID
+
+// 蜂窝网络
+$network.cellular.radio; // 蜂窝制式 (LTE/NR/etc)
+
+// DNS
+$network.dns;            // DNS 服务器列表 [String]
+
+// 网关
+$network.gateway;        // 网关 IP
+```
+
+典型用途：根据网络环境切换策略、WiFi SSID 判断、DNS 变更通知。
+
+### 10.5 Surge 模块封装
+
+与 QX 的配置嵌入不同，Surge 用 `.sgmodule` 文件封装模块：
+
+```ini
+#!name=示例模块
+#!desc=模块描述
+#!author=作者
+#!homepage=https://github.com/...
+
+[Script]
+解锁 = type=http-response,pattern=^https?://api\.example\.com/vip,script-path=https://...,requires-body=true
+
+[Script]
+签到 = type=cron,cronexp="30 8 * * *",script-path=https://...,timeout=60
+
+[MITM]
+hostname = api.example.com
+```
+
+使用 `Script-Hub` 可以在各平台模块间互相转换。
+
+
+### 十一、高级技巧（原始）
+
+
+---
+
+## 十八、Script-Hub 平台自动转换
+
+  const result = await resp.json();
+  const msg = result.message || '签到完成';
+
+  ctx.notify({ title: '签到结果', body: msg });
+}
+```
+
+### 9.8 存量脚本迁移
+
+现有 QX/Surge 脚本迁移到 Egern 的对照表：
+
+|操作|QX 写法|Egern 写法|
+|---|---|---|
+|修改变量|`$done({body: JSON.stringify(obj)})`|`return {body: obj}`|
+|解析响应|`JSON.parse($response.body)`|`await ctx.response.json()`|
+|读请求头|`$request.headers['Cookie']`|`ctx.request.headers.get('Cookie')`|
+|返回空|`$done({})` (不修改)|`return` (不修改)|
+|拒绝请求|无法|`return ctx.abort()`|
+|直接响应|无法|`return ctx.respond({status:200, body:'OK'})`|
+|读存储|`$prefs.valueForKey('k')`|`ctx.storage.get('k')`|
+|写存储|`$prefs.setValueForKey('v', 'k')`|`ctx.storage.set('k', 'v')`|
+
+### 9.9 自动转换（推荐）
+
+**方案一：Script-Hub（全自动，推荐）**
+
+[Script-Hub](https://github.com/Script-Hub-Org/Script-Hub) 是一个高级脚本转换器，支持 QX → Surge/Loon/Stash/Egern/Shadowrocket 之间的互转：
+
+```yaml
+# 使用方法
+# 1. 浏览器打开 Script-Hub 网页
+# 2. 来源类型: QX 重写/ Surge 模块 / Loon 插件
+# 3. 目标类型: Egern
+# 4. 输入我们的 QX rewrite 规则链接
+# 5. 一键转换 → 得到 Egern 配置
+```
+
+转换效果示例：
+
+```
+# QX 规则:
+^https?://api\.example\.com/vip url script-response-body https://.../App.js
+
+# → Script-Hub 自动转为 Egern:
+http-response:
+  - match: ^https?://api\.example\.com/vip
+    script: https://.../App.js
+
+# QX [task_local]:
+30 8 * * * https://.../checkin.js
+
+# → Egern:
+schedule:
+  - cron: 30 8 * * *
+    script: https://.../checkin.js
+
+# QX [mitm]:
+hostname = api.example.com
+
+# → Egern:
+mitm:
+  - hostname: api.example.com
+```
+
+**方案二：Egern 模块转换器（仅限 Surge→Egern）**
+
+[gen.egernapp.com](https://gen.egernapp.com/) 可以将 Surge 模块转为 Egern 格式。
+
+**注意：** 脚本内部的 JS 代码（`$done()` vs `return`）Script-Hub 尚不能自动转换。如需在 Egern 原生运行脚本，参考 9.2-9.6 节的迁移指南。
+
+
+
+
+
+---
+
+## 十九、高级技巧：jq filter 与 reject 变体
+
+
+### 11.1 JQ 表达式修改（无需JS，更轻量）
+
+QX 最新版本支持 JQ 表达式直接在重写规则中修改 JSON 响应体，无需编写 JavaScript。
+
+**JQ 语法示例：**
+
+```
+# 将 ads 数组置空
+^https?:\/\/api\.example\.com\/ad url script-response-body jq '.ads = []'
+
+# 将 ad_enabled 设为 false
+^https?:\/\/api\.example\.com\/config url script-response-body jq '.ad_enabled = false'
+
+# 同时修改多个字段
+^https?:\/\/api\.example\.com\/vip\/info url script-response-body jq '.vip = 1 | .vip_type = "svip" | .expires = "4092599349000"'
+
+# 深层嵌套操作
+^https?:\/\/api\.example\.com\/user url script-response-body jq '.data.vip = true | .data.expireTime = "4092599349000"'
+
+# 删除字段
+^https?:\/\/api\.example\.com\/response url script-response-body jq 'del(.ads) | del(.tracker)'
+```
+
+**JQ vs JS 的选择：**
+
+|场景|推荐方式|原因|
+|---|---|---|
+|简单字段修改（改1-3个值）|JQ|一行搞定，性能好|
+|复杂逻辑（条件判断、循环）|JS|JQ 不支持复杂逻辑|
+|去广告（置空数组/改开关）|JQ|最常用场景，JQ 最合适|
+|替换整个响应体|JS|需要完整构造新 JSON|
+|按 URL 分路径处理|JS|JQ 无法做 URL 判断|
+
+### 11.2 Reject 系列（无需脚本，零开销去广告）
+
+QX 内置的 reject 类型是去广告最高效的方式：
+
+```
+# 直接拒绝请求（返回 404）
+^https?:\/\/ad\.example\.com\/track url reject
+
+# 返回空 JSON 对象（适用于广告API）
+^https?:\/\/api\.example\.com\/ad url reject-dict
+
+# 返回空 JSON 数组
+^https?:\/\/api\.example\.com\/ad\/items url reject-array
+
+# 返回 1px 图片
+^https?:\/\/ad\.example\.com\/banner url reject-img
+
+# 返回空 200
+^https?:\/\/ad\.example\.com\/ping url reject-200
+```
+
+### 11.3 Conf 文件管理规则
+
+```
+# AD_Block.conf
+[rewrite_local]
+^https?:\/\/ad\.example\.com url reject
+^https?:\/\/api\.example\.com\/ad url reject-dict
+
+[mitm]
+hostname = ad.example.com, api.example.com
+```
+
+### 11.4 模块化设计
+
+复杂脚本建议拆分为 Cookie/签到/解锁 三个独立文件。
+
+### 十二、仓库结构说明（原始）
+
+### 文件分布
+
+|目录|平台|格式|说明|
+|---|---|---|---|
+|`script/`|通用|`.js`|核心脚本源码|
+|`surge/`|Surge / Egern|`.sgmodule`|Surge 模块，Egern 通用|
+|`loon/`|Loon|`.plugin` / `.lpx`|Loon 插件（新旧双格式）|
+
