@@ -1,6 +1,6 @@
 ---
 name: Quantumultx
-description: "Quantumult X 全能脚本编写技能。覆盖 5 大脚本类型、配置文件全字段详解、MITM抓包→脚本流程、rewrite_local/remote、task_local、配置片段、资源解析器、HAR→脚本转换、持久化与BoxJS"
+description: "Quantumult X 全能脚本编写技能。覆盖 QX/Surge/Loon/Egern/Stash 五大平台 API、配置文件全字段详解、HAR→脚本工作流、跨平台 Env.js 框架、脚本模板库、HAR Parser 自动化工具、Task/Rewrite/MITM 全系列、持久化与 BoxJS。提供 Python HAR 解析器源码。"
 tags: [QuantumultX, proxy, rewrite, task, mitm, filter, policy, boxjs, script, har]
 ---
 
