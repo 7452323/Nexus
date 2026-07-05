@@ -1644,3 +1644,301 @@ hostname = ad.example.com, api.example.com
 |`surge/`|Surge / Egern|`.sgmodule`|Surge 模块，Egern 通用|
 |`loon/`|Loon|`.plugin` / `.lpx`|Loon 插件（新旧双格式）|
 
+## 二十、复杂响应篡改高级模式（2026 新增）
+
+> 基于 ShortcutStudio / 各类 SaaS 限额系统的通用破解范式。覆盖条件拦截、配置开关、结构化数据伪造、多端点编排四层。
+
+### 19.1 四层架构
+
+```
+┌─────────────────────────────────────────────────┐
+│  Layer 4: 多端点编排                              │
+│  不同 API 路径 → 不同处理函数                       │
+├─────────────────────────────────────────────────┤
+│  Layer 3: 结构化数据伪造                           │
+│  构建嵌套 JSON，含类型校验、默认值                   │
+├─────────────────────────────────────────────────┤
+│  Layer 2: 配置开关层                               │
+│  BoxJS / URL 参数 / 持久化存储 控制 mock 开/关       │
+├─────────────────────────────────────────────────┤
+│  Layer 1: 条件拦截层                               │
+│  URL 正则匹配 + body 存在性检查 + 安全 JSON 解析     │
+└─────────────────────────────────────────────────┘
+```
+
+### 19.2 Layer 1 — 条件拦截（先判断再动手）
+
+```javascript
+// 通用条件拦截模板 — 只改目标 API，其余原样返回
+async function handleResponse(request, response) {
+  const url = request.url;
+  const limitsPattern = /\/users\/me\/limits(?:[?#/]|$)/i;
+  const signPattern   = /\/sign(?:[?#/]|$)/i;
+  const generatePattern = /\/generate(?:[?#/]|$)/i;
+
+  // URL 不匹配 → 原样返回
+  if (!limitsPattern.test(url) && !signPattern.test(url) && !generatePattern.test(url)) {
+    return response;
+  }
+
+  // body 不存在 → 原样返回
+  if (!response.body || response.body.trim() === '') {
+    return response;
+  }
+
+  // 安全 JSON 解析
+  let parsed;
+  try {
+    parsed = JSON.parse(response.body);
+  } catch (e) {
+    return response;  // 非 JSON 不处理
+  }
+
+  // 类型校验
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return response;
+  }
+
+  return parsed;
+}
+```
+
+### 19.3 Layer 2 — 配置开关（BoxJS + URL 参数双层）
+
+```javascript
+// 配置优先级：URL 参数 > BoxJS 持久存储 > 硬编码默认值
+
+// 默认配置
+const DEFAULTS = {
+  limitsMock: 'off',           // 总开关
+  messagesLimit: 999,
+  downloadsLimit: 999,
+  searchesLimit: 999,
+  uploadsLimit: 999,
+  marketplaceDownloadsLimit: 999,
+  chatInputCharsLimit: 20000,
+};
+
+// BoxJS 存储键名
+const BOXJS_KEYS = {
+  limitsMock: 'ShortcutStudio.limitsMock',
+  messagesLimit: 'ShortcutStudio.messagesLimit',
+  downloadsLimit: 'ShortcutStudio.downloadsLimit',
+  searchesLimit: 'ShortcutStudio.searchesLimit',
+  uploadsLimit: 'ShortcutStudio.uploadsLimit',
+  marketplaceDownloadsLimit: 'ShortcutStudio.marketplaceDownloadsLimit',
+  chatInputCharsLimit: 'ShortcutStudio.chatInputCharsLimit',
+};
+
+// 持久化读取
+function readConfig() {
+  const config = {};
+  for (const [key, boxjsKey] of Object.entries(BOXJS_KEYS)) {
+    let val = null;
+    try { val = $.getItem(boxjsKey); } catch(e) {}
+    if (val != null && String(val).trim() !== '') {
+      config[key] = val;
+    }
+  }
+  return { ...DEFAULTS, ...config };
+}
+
+// URL 参数覆盖（?limitsMock=on&messagesLimit=9999）
+function readUrlParams(url) {
+  const params = {};
+  try {
+    const q = url.split('?')[1];
+    if (!q) return params;
+    q.split('&').forEach(pair => {
+      const [k, v = ''] = pair.split('=', 2);
+      const decoded = decodeURIComponent(v.replace(/\+/g, ' '));
+      if (k) params[k] = decoded;
+    });
+  } catch(e) {}
+  return params;
+}
+
+// 统一开关判断
+function isMockEnabled(limitsMock) {
+  const v = String(limitsMock ?? '').trim().toLowerCase();
+  return v === 'on' || v === '1' || v === 'true' || v === 'yes' || v === 'enable' || v === 'enabled';
+}
+```
+
+### 19.4 Layer 3 — 结构化数据伪造（构建嵌套 JSON）
+
+```javascript
+// 函数式字段构建器 — 带类型校验、边界默认
+function buildLimitField(value, fallback = 0) {
+  const num = parseInt(String(value ?? ''), 10);
+  const limit = Number.isFinite(num) && num >= 0 ? num : fallback;
+
+  return {
+    allowed: limit > 0,
+    current: 0,
+    limit: limit,
+    remaining: limit,
+  };
+}
+
+// 余额/积分类字段
+function buildCreditField(value, fallback = 99999) {
+  const num = parseInt(String(value ?? ''), 10);
+  const amount = Number.isFinite(num) && num >= 0 ? num : fallback;
+
+  return {
+    total: amount,
+    used: 0,
+    remaining: amount,
+    unit: 'credits',
+  };
+}
+
+// 注入限额响应
+function injectLimits(originalBody, config) {
+  const obj = typeof originalBody === 'string'
+    ? JSON.parse(originalBody)
+    : originalBody;
+
+  obj.limits = obj.limits && typeof obj.limits === 'object' ? obj.limits : {};
+
+  obj.limits.messages = buildLimitField(config.messagesLimit);
+  obj.limits.downloads = buildLimitField(config.downloadsLimit);
+  obj.limits.searches = buildLimitField(config.searchesLimit);
+  obj.limits.uploads = buildLimitField(config.uploadsLimit);
+  obj.limits.marketplace_downloads = buildLimitField(config.marketplaceDownloadsLimit);
+  obj.limits.chat_input_chars = buildLimitField(config.chatInputCharsLimit);
+
+  return obj;
+}
+```
+
+### 19.5 Layer 4 — 多端点编排（完整版）
+
+```ini
+# config斯诺
+hostname = api.shortcutstudio.app
+
+# 每个端点独立处理
+^https://api\.shortcutstudio\.app/generate([?#/]|$) url script-response-body https://xxx/response.js
+^https://api\.shortcutstudio\.app/sign([?#/]|$)     url script-response-header https://xxx/request.js
+^https://api\.shortcutstudio\.app/users/me/limits([?#/]|$) url script-response-body https://xxx/response.js
+^https://api\.shortcutstudio\.app/users/me/limits([?#/]|$) url script-response-header https://xxx/request.js
+```
+
+```javascript
+// response.js — 统一出口，按 URL 分发
+const HANDLERS = {
+  limits: handleLimitsResponse,
+  sign: handleSignResponse,
+};
+
+async function main() {
+  const url = $request.url.toLowerCase();
+
+  // 分发
+  for (const [name, handler] of Object.entries(HANDLERS)) {
+    if (url.includes(`/${name}`)) {
+      $response = await handler($request, $response);
+      break;
+    }
+  }
+
+  done($response);
+}
+
+main().catch(e => {
+  console.error(e);
+  done({});
+});
+
+function handleLimitsResponse(request, response) {
+  if (!response?.body) return response;
+
+  const config = readConfig();
+  const urlParams = readUrlParams(request.url);
+  const merged = { ...config, ...urlParams };
+
+  if (!isMockEnabled(merged.limitsMock)) return response;
+
+  let parsed;
+  try { parsed = JSON.parse(response.body); } catch { return response; }
+
+  const enriched = injectLimits(parsed, merged);
+
+  // 清理 Content-Length（body 改了，原长度失效）
+  const headers = response.headers && typeof response.headers === 'object'
+    ? { ...response.headers } : {};
+  delete headers['Content-Length'];
+  delete headers['content-length'];
+
+  return { ...response, body: JSON.stringify(enriched), headers };
+}
+```
+
+### 19.6 关键遗漏清单（避免踩坑）
+
+| 遗漏 | 后果 | 必须加 |
+|------|------|--------|
+| 未检查 `$response.body` 存在 | 非 body 响应直接崩溃 | `if (!?.body) return` |
+| JSON.parse 无 try-catch | 非 JSON 500 错误 | 全部包裹 |
+| 未清理 Content-Length | body 改了但长度标记是旧的，QX 报错 | `delete headers['Content-Length']` |
+| 没做类型校验 | 数组被当对象改 | `typeof === 'object' && !Array.isArray` |
+| 忽略配置优先级 | BoxJS/参数/默认混读 | 三层合并 `{...defaults, ...boxjs, ...urlParams}` |
+| 无 mock 开关 | 全局生效无法关 | 三层判断 `on/1/true/yes/enable` |
+
+### 19.7 与 RevenueCat 双规则对比
+
+| 维度 | RevenueCat 模式 | SaaS 限额模式 (本节) |
+|------|----------------|-------------------|
+| 目标 | 改 body 注入 entitlement | 改 body 注入 limit 数值 |
+| Header 改动 | 去 x-signature/etag | 去 Content-Length |
+| 配置层 | 一般写死 | BoxJS + URL 参数可调 |
+| 多端点 | 单一subscriber端点 | generate/sign/limits 三分 |
+| 数据复杂度 | 嵌套 entitlement 对象 | 嵌套 limit 对象 + buildLimitField |
+| X-Header | 必有 (StoreKit) | 一般无 |
+
+### 19.8 通用破解 SaaS 的 5 步法
+
+```
+Step 1: 抓包 → 找到 /limits / /quota / /usage / /me / /subscription 等端点
+Step 2: 找响应体中控制限额的 JSON 字段（常见：limits, quota, usage, subscription, plan）
+Step 3: 分析字段结构（是纯数字？对象含 limit/used/remaining？嵌套层级？）
+Step 4: 写 mock 响应：对应字段替换为极大值 / allowed: true / expires_date: null
+Step 5: 配置 BoxJS 开关 + Content-Length 清理 → 全局生效
+```
+
+### 19.9 BoxJS 订阅写法
+
+BoxJS 面板需提供 mock 开关 + 数值自定义：
+
+```json
+{
+  "id": "ShortcutStudio@youth",
+  "name": "ShortcutStudio 破解",
+  "keys": [
+    "@ShortcutStudio.limitsMock",
+    "@ShortcutStudio.messagesLimit",
+    "@ShortcutStudio.downloadsLimit"
+  ],
+  "settings": [
+    {
+      "id": "@ShortcutStudio.limitsMock",
+      "val": "off",
+      "type": "radios",
+      "items": [
+        { "key": "on", "label": "开启 mock" },
+        { "key": "off", "label": "关闭 mock" }
+      ]
+    },
+    {
+      "id": "@ShortcutStudio.messagesLimit",
+      "val": 999,
+      "type": "number",
+      "label": "消息次数"
+    }
+  ],
+  "author": "@youth",
+  "repo": "https://github.com/..."
+}
+```
