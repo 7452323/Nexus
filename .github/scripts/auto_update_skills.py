@@ -24,6 +24,14 @@ DECRYPT_QUERIES = [
     "obfuscator.io deobfuscate",
     "wasm deobfuscation",
     "webcrack javascript",
+    # 验证码/Cloudflare
+    "captcha bypass solver",
+    "cloudflare bypass",
+    "flaresolverr",
+    "cloudscraper",
+    "anti-bot detection bypass",
+    "puppeteer stealth",
+    "playwright anti-detection",
 ]
 
 # 搜索查询 - 逆向工程
@@ -45,6 +53,20 @@ REVERSE_QUERIES = [
     "cryptographic analysis tool",
     "unpacker unpacking UPX",
     "anti-debug bypass",
+    # 验证码绕过
+    "captcha bypass solver",
+    "reCAPTCHA v2 v3 solver",
+    "hcaptcha bypass solver",
+    "slider captcha bypass",
+    "image captcha ocr",
+    "anti-bot captcha",
+    # Cloudflare 绕过
+    "cloudflare bypass",
+    "cloudflare turnstile solver",
+    "cf-clearance scraper",
+    "flaresolverr",
+    "cloudscraper python",
+    "bypass cloudflare 5 seconds",
 ]
 
 # 排序方式
