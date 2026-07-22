@@ -51,6 +51,55 @@ description: 本机工具可用性清单（iSH/Alpine Linux aarch64）。
 | esprima | JS 解析器 | `npm install esprima` |
 | JSRPC | WebSocket 远程调用 | `pip install jsrpc` |
 
+### Pwn / Exploit
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| pwntools | Exploit 开发框架 | `pip install pwntools` |
+| ROPgadget | ROP gadget 搜索 | `pip install ropgadget` |
+| ropper | ROP gadget 搜索 | `pip install ropper` |
+| one_gadget | libc 中 execve 搜索 | 手动编译 |
+| angr | 符号执行 | `pip install angr` |
+| LibcSearcher | libc 版本查找 | `pip install LibcSearcher` |
+| capstone | 反汇编引擎 | `pip install capstone` |
+| keystone | 汇编引擎 | `pip install keystone` |
+| unicorn | CPU 模拟器 | `pip install unicorn` |
+
+### Web 安全 / 渗透
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| SQLMap | SQL 注入 | `pip install sqlmap` |
+| Nmap | 端口扫描 | `apk add nmap` |
+| Nuclei | 模板化扫描 | `apk add nuclei` |
+| ffuf | 目录爆破 | `apk add ffuf` |
+| Hashcat | 密码破解 | ❌ 需 GPU |
+| Hydra | 在线密码攻击 | `apk add hydra` |
+
+### 取证与事件响应
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| Volatility3 | 内存取证 | `pip install volatility3` |
+| Autopsy | 磁盘取证 | ❌ Java GUI |
+| Sleuth Kit | 磁盘取证 | `apk add sleuthkit` |
+| Plaso | 时间线 | `pip install plaso` |
+| exiftool | 元数据 | `apk add exiftool` |
+
+### 固件 / IoT
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| binwalk | 固件分析 | `pip install binwalk` |
+| QEMU | 全系统仿真 | `apk add qemu-system-x86_64 qemu-system-arm` |
+| unblob | 固件提取 | `pip install unblob` |
+| cve-bin-tool | CVE 检测 | `pip install cve-bin-tool` |
+| flashrom | SPI 读取 | ❌ 需硬件 |
+
+### AI 安全
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| Garak | LLM 漏洞扫描 | `pip install garak` |
+| PyRIT | AI 风险识别 | `pip install pyrit` |
+| TextAttack | 对抗攻击 | `pip install textattack` |
+| OpenAttack | 对抗攻击 | `pip install openattack` |
+
 ### 网络请求
 | 工具 | 用途 |
 |------|------|
@@ -72,6 +121,8 @@ description: 本机工具可用性清单（iSH/Alpine Linux aarch64）。
 | Burp Suite | mitmproxy + Python |
 | Charles | mitmproxy |
 | Wireshark | tcpdump |
+| Cobalt Strike | Sliver (Go, 可编译) |
+| Volatility2 | Volatility3 (pip 安装) |
 
 ## 工具安装速查
 
@@ -85,7 +136,24 @@ pip install seleniumbase pydoll scrapling curl_cffi cloudscraper
 # JS 逆向
 npm install @babel/parser @babel/traverse @babel/generator js-beautify esprima
 
+# Pwn / Exploit
+pip install pwntools ropgadget ropper angr capstone keystone unicorn LibcSearcher
+
+# Web 安全
+pip install sqlmap
+apk add nmap nuclei ffuf hydra
+
+# 取证
+pip install volatility3 plaso
+apk add sleuthkit exiftool
+
+# 固件
+pip install binwalk unblob cve-bin-tool
+apk add qemu-system-x86_64 qemu-system-arm
+
+# AI 安全
+pip install garak textattack openattack
+
 # Node.js
 apk add nodejs npm
 ```
-
