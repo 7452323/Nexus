@@ -13,20 +13,45 @@ from datetime import datetime
 GITHUB_API = "https://api.github.com/search/repositories"
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
-# 搜索查询
-SEARCH_QUERIES = [
-    # 解密/反混淆
+# 搜索查询 - 解密/反混淆
+DECRYPT_QUERIES = [
     "javascript deobfuscation",
     "js deobfuscator",
     "code obfuscation decrypt",
     "steganography analysis",
     "frida anti-detection",
+    "jsjiami decode",
+    "obfuscator.io deobfuscate",
+    "wasm deobfuscation",
+    "webcrack javascript",
+]
+
+# 搜索查询 - 逆向工程
+REVERSE_QUERIES = [
     "reverse engineering tool",
     "binary analysis decompiler",
     "protocol reverse engineering",
     "VM devirtualization",
     "mobile reverse engineering",
+    "iOS reverse engineering Android",
+    "IDA Pro plugin Ghidra",
+    "frida hooking script",
+    "binary diffing bindiff",
+    "malware analysis tool",
+    "x64dbg debugger",
+    "decompiler ilspy dnSPy",
+    "firmware analysis embedded",
+    "packet decryption network",
+    "cryptographic analysis tool",
+    "unpacker unpacking UPX",
+    "anti-debug bypass",
 ]
+
+# 排序方式
+SORT_BY = {
+    "stars": "stars",           # 按 Stars
+    "updated": "updated",       # 按最后更新时间
+}
 
 HEADERS = {
     "Accept": "application/vnd.github.v3+json",
@@ -109,11 +134,11 @@ def update_decrypt_skill(new_repos):
     date_str = datetime.now().strftime("%Y-%m-%d")
     new_section = f"\n\n<!-- 自动发现 {date_str} -->\n"
     new_section += "## 自动发现的新工具\n\n"
-    new_section += "| 仓库 | Stars | 描述 |\n"
-    new_section += "|------|-------|------|\n"
+    new_section += "| 仓库 | Stars | 最近更新 | 描述 |\n"
+    new_section += "|------|-------|---------|------|\n"
     
     for repo in unique_repos[:8]:  # 最多8个
-        new_section += f"| [{repo['owner']}/{repo['name']}]({repo['url']}) | {repo['stars']}⭐ | {repo['desc'][:80]} |\n"
+        new_section += f"| [{repo['owner']}/{repo['name']}]({repo['url']}) | {repo['stars']}⭐ | {repo.get('updated','')} | {repo['desc'][:60]} |\n"
     
     # 在 minis_url 之前插入
     if "minis_url:" in content:
@@ -146,11 +171,11 @@ def update_reverse_skill(new_repos):
     date_str = datetime.now().strftime("%Y-%m-%d")
     new_section = f"\n\n<!-- 自动发现 {date_str} -->\n"
     new_section += "## 自动发现的新工具\n\n"
-    new_section += "| 仓库 | Stars | 描述 |\n"
-    new_section += "|------|-------|------|\n"
+    new_section += "| 仓库 | Stars | 最近更新 | 描述 |\n"
+    new_section += "|------|-------|---------|------|\n"
     
-    for repo in unique_repos[:8]:
-        new_section += f"| [{repo['owner']}/{repo['name']}]({repo['url']}) | {repo['stars']}⭐ | {repo['desc'][:80]} |\n"
+    for repo in unique_repos[:15]:
+        new_section += f"| [{repo['owner']}/{repo['name']}]({repo['url']}) | {repo['stars']}⭐ | {repo.get('updated','')} | {repo['desc'][:60]} |\n"
     
     if "minis_url:" in content:
         content = content.replace("minis_url:", new_section + "\nminis_url:")
@@ -168,15 +193,32 @@ def main():
     
     all_repos = []
     
-    for query in SEARCH_QUERIES:
-        print(f"[*] 搜索: {query}")
-        items = search_github(query, per_page=5)
+    # 按 Stars 搜索
+    print("[*] 按 Stars 排序搜索...")
+    for query in DECRYPT_QUERIES + REVERSE_QUERIES:
+        items = search_github(query, sort="stars", per_page=5)
         for item in items:
             repo_info = {
                 "owner": item["owner"]["login"],
                 "name": item["name"],
                 "url": item["html_url"],
                 "stars": item["stargazers_count"],
+                "updated": item.get("updated_at", "")[:10],
+                "desc": (item.get("description") or "")[:200],
+            }
+            all_repos.append(repo_info)
+    
+    # 按更新时间搜索
+    print("[*] 按更新时间排序搜索...")
+    for query in REVERSE_QUERIES:
+        items = search_github(query, sort="updated", per_page=3)
+        for item in items:
+            repo_info = {
+                "owner": item["owner"]["login"],
+                "name": item["name"],
+                "url": item["html_url"],
+                "stars": item["stargazers_count"],
+                "updated": item.get("updated_at", "")[:10],
                 "desc": (item.get("description") or "")[:200],
             }
             all_repos.append(repo_info)
@@ -197,7 +239,7 @@ def main():
     
     # 分别更新两个技能
     decrypt_updated = update_decrypt_skill(unique[:20])
-    reverse_updated = update_reverse_skill(unique[:20])
+    reverse_updated = update_reverse_skill(unique[:30])
     
     if decrypt_updated or reverse_updated:
         print("[+] 技能已更新，等待提交")
