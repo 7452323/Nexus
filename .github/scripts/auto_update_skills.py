@@ -9,9 +9,9 @@ import re
 import os
 from datetime import datetime
 
-# GitHub API 配置
+# GitHub API 配置 - 优先使用小号 token（搜索限流更宽松）
 GITHUB_API = "https://api.github.com/search/repositories"
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_TOKEN = os.environ.get("SEARCH_GITHUB_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
 
 # 搜索查询 - 解密/反混淆
 DECRYPT_QUERIES = [

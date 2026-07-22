@@ -34,6 +34,7 @@ jobs:
           python3 .github/scripts/auto_update_skills.py
         env:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          SEARCH_GITHUB_TOKEN: ${{ secrets.SEARCH_GITHUB_TOKEN }}
       
       - name: Check for changes
         id: check_changes
