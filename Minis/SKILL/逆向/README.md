@@ -1,50 +1,74 @@
-# 🔧 逆向工程技能树 - Reverse Engineering Skills
-
-> 26 个逆向技能全覆盖，从 Web JS 到 Native SO、从二进制到协议的全栈逆向场景。
-
-## 📂 技能索引 (26个)
-
-| 技能 | 用途 |
-|------|------|
-| `algorithm-reverse` | JS逆向算法还原——签名/混合加密/Cookie签名 |
-| `android-reverse-engineering` | Android应用逆向——APK反编译/smali/Frida Hook/JNI分析/脱壳 |
-| `anti-debug` | JS反调试对抗——4类反调试识别+绕过 |
-| `anti-debugging-techniques` | 反调试检测+绕过通用playbook |
-| `ast-deobfuscation` | Babel AST分层定向反混淆——7步流程 |
-| `binary-diffing` | 二进制Diffing——Diaphora/BinDiff对比+补丁分析+1-day漏洞 |
-| `camoufox-workflow` | JS逆向工作流——Node.js/Python接口自动化+签名还原 |
-| `code-obfuscation-deobfuscation` | 代码混淆分析+反混淆playbook |
-| `desktop-app-reverse-engineering` | 桌面应用逆向——静态分析+前端资源提取+AI prompt提取 |
-| `env-patch` | JS补环境统一技能——Node.js引擎+策略分离架构 |
-| `find-crypto-entry` | 定位加密参数生成入口（函数位置+调用链） |
-| `har-to-proxy-script` | HAR抓包→QuantumultX/Surge代理脚本 |
-| `ida-reverse-analysis` | IDA Pro逆向分析——IDAPython脚本+加密识别+DLL导出 |
-| `ios-app-unlock` | iOS原生Swift应用逆向——Swift5反射+二进制Hook |
-| `js-reverse-engineering` | JS逆向总纲——6阶段全流程（Observe→Capture→Rebuild→Patch→PureExt→Auto） |
-| `js-reverse-mcp-integration` | JS逆向MCP集成——Patchright反检测引擎+23种工具 |
-| `jsvmp-reverse` | JSVMP/VMP虚拟机逆向——数据驱动+AST反编译双路线 |
-| `protocol-reverse-engineering` | 协议逆向——protobuf-inspector/netzob/Wireshark+消息格式分析 |
-| `pyinstaller-reverse` | PyInstaller打包逆向——解包+反编译+恢复源码 |
-| `reverse-engineering-general` | 通用逆向框架——8个子技能（Frida/Unicorn/IDA/DexDump等） |
-| `ruishu-reverse` | 瑞数反爬纯算逆向——Cookie T生成+URL后缀 |
-| `so-native-analysis` | SO原生库分析——30种工具覆盖基本分析+Flutter专项 |
-| `symbolic-execution-tools` | 符号执行+约束求解工具链 |
-| `vm-and-bytecode-reverse` | 自定义VM+字节码逆向通用playbook |
-| `web-api-reverse-engineering` | Web API协议逆向通用方法论 |
-| `web-api-to-openai-proxy` | Web API逆向→OpenAI兼容代理服务构建 |
-| `webpack-unpack` | Webpack打包模块提取+还原独立可运行JS |
-
-## ⚡ 典型工作流
-
-### Web JS 逆向全流程
-`anti-debug` → `find-crypto-entry` → `env-patch` → `ast-deobfuscation` → `algorithm-reverse` → `web-api-to-openai-proxy`
-
-### 移动端逆向全流程
-`android-reverse-engineering` → `so-native-analysis` → `ida-reverse-analysis` → `reverse-engineering-general`
-
-### VMP 逆向全流程
-`anti-debug` → `ast-deobfuscation`(预处理) → `jsvmp-reverse`(VMP还原) → `algorithm-reverse`(算法提取)
-
+---
+name: reverse-engineering-index
+description: 逆向工程技能树索引。覆盖AI驱动逆向、JS逆向、反调试对抗、桌面/移动端逆向、Web API协议逆向、PyInstaller逆向、VM/字节码逆向、代码混淆、二进制逆向、协议逆向、二进制仿真、恶意软件分析13大子领域。
 ---
 
-📦 由 [reverse-engineering-skills] 导入 @ 2026-05-26 09:42:36
+# 🔧 逆向工程技能树
+
+> 逆向工程 = 从编译产物还原逻辑。覆盖 Web JS 到 Native SO、二进制到协议的全栈逆向场景。
+> **环境**: iSH Alpine Linux aarch64 — 优先浏览器取证 + Python/Node 本地复现。
+
+## ⚡ 快速入口
+
+| 文件 | 用途 |
+|------|------|
+| **[SKILL.md](SKILL.md)** | 📌 主索引 + 工作流 + 工具矩阵 |
+| **[INDEX.md](INDEX.md)** | 📌 完整目录索引 + 知识库 |
+| **[cf-bypass.md](web-api/cf-bypass.md)** | 📌 Cloudflare 绕过全套方案 (2026) |
+
+## 📂 子领域速查
+
+| 领域 | 入口 | 关键工具 |
+|------|------|---------|
+| **AI 驱动逆向** | [ai-driven-reverse.md](ai-driven-reverse.md) | GhidraMCP, LLM, 符号执行 MCP |
+| **JS 逆向** | [js-reverse/](js-reverse/) | Babel AST, JSRPC, Node 补环境 |
+| **反调试对抗** | [js-reverse/anti-debug.md](js-reverse/anti-debug.md) | 4类JS反调试+二进制反调试 |
+| **Web API 逆向** | [web-api/](web-api/) | ChatGPT协议, PoW/Turnstile |
+| **CF 绕过** | [web-api/cf-bypass.md](web-api/cf-bypass.md) | SeleniumBase, Pydoll, Scrapling |
+| **桌面逆向** | [desktop/desktop-app-reverse.md](desktop/desktop-app-reverse.md) | Wails, Electron, Tauri |
+| **Android 逆向** | [mobile/android-reverse.md](mobile/android-reverse.md) | jadx, apktool, Frida |
+| **iOS 逆向** | [SKILL.md#5-ios-逆向](SKILL.md) | Frida, SSL pinning bypass |
+| **二进制逆向** | [binary/ida-reverse.md](binary/ida-reverse.md) | IDA, Ghidra, Unicorn |
+| **代码混淆** | [js-reverse/ast-deobfuscation.md](js-reverse/ast-deobfuscation.md) | Babel, deobfuscator |
+| **安全研究** | [security/](security/) | 恶意软件, API安全 |
+| **代理脚本** | [proxy-script/](proxy-script/) | QX, Surge, Loon |
+
+## 🔀 典型工作流
+
+### Web JS 逆向
+```
+anti-debug → find-crypto-entry → env-patch → ast-deobfuscation → algorithm-reverse
+```
+
+### CF 绕过 (2026 推荐)
+```
+轻量: curl_cffi → 中量: SeleniumBase UC+CDP → 重量: Pydoll/Scrapling → 最后: 住宅代理
+```
+
+### AI 驱动二进制逆向
+```
+GhidraMCP → 自动反编译 → LLM分析函数 → 自动重命名 → 提取协议/算法
+```
+
+## 🆕 2026 更新
+
+- **AI 驱动逆向** — GhidraMCP + LLM 自动反编译/重命名
+- **CF 绕过** — SeleniumBase / Pydoll / Scrapling 新一代工具
+- **符号执行 MCP** — angr + taint analysis 集成
+- **JSRPC 全自动** — 不补环境、不还原算法
+
+## 📊 仓库统计
+
+- **文件数**: 98+
+- **子领域**: 13
+- **工作流**: 8+
+- **工具链**: 50+
+
+## 关联技能
+
+| 技能 | 路径 |
+|------|------|
+| 解密技能 | `/var/minis/skills/解密/` |
+| 浏览器工具 | Minis browser_use |
+| App Store 价格 | `/var/minis/skills/appstoreprice-hub/` |
+

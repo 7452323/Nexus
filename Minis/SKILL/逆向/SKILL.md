@@ -1,9 +1,9 @@
 ---
 name: reverse-engineering-index
-description: 逆向工程技能树索引。覆盖AI驱动逆向、JS逆向、反调试对抗、桌面/移动端逆向、Web API协议逆向、PyInstaller逆向、VM/字节码逆向、代码混淆、二进制逆向、协议逆向、二进制仿真、恶意软件分析12大子领域。
+description: 逆向工程技能树索引。覆盖AI驱动逆向、JS逆向、反调试对抗、桌面/移动端逆向、Web API协议逆向、PyInstaller逆向、VM/字节码逆向、代码混淆、二进制逆向、协议逆向、二进制仿真、恶意软件分析13大子领域。
 metadata:
   display_name: "🔧 逆向工程技能树"
-  intent_patterns: "逆向,反编译,脱壳,JS逆向,反调试,Frida,Ghidra,IDA,解混淆,二进制,协议逆向,签名还原,补环境,AST,Unicorn,Android逆向,iOS逆向,小程序逆向,Cloudflare绕过"
+  intent_patterns: "逆向,反编译,脱壳,JS逆向,反调试,Frida,Ghidra,IDA,解混淆,二进制,协议逆向,签名还原,补环境,AST,Unicorn,Android逆向,iOS逆向,小程序逆向,Cloudflare绕过,SeleniumBase,Pydoll,Scrapling"
 ---
 
 # 🔧 逆向工程技能树
@@ -14,22 +14,24 @@ metadata:
 
 ## 📂 子领域索引
 
-### 1. AI 驱动逆向
-| 工具 | 用途 |
-|------|------|
-| **LaurieWired/GhidraMCP** | Ghidra MCP 服务器，LLM 自动反编译/分析/重命名 |
-| **bethington/ghidra-mcp** | 另一个 Ghidra MCP，245 个工具，支持 P-code 模拟 |
+### 1. AI 驱动逆向 (NEW 2026)
+| 工具 | 用途 | Stars |
+|------|------|-------|
+| **LaurieWired/GhidraMCP** | Ghidra MCP 服务器，LLM 自动反编译/分析/重命名 | 3.2k |
+| **bethington/ghidra-mcp** | 另一个 Ghidra MCP，245 个工具，支持 P-code 模拟 | 245 |
+| **abstract-state/symbolic-execution-mcp** | 符号执行 MCP，集成 angr/taint analysis | new |
+| **semba/llm-reverse** | LLM 辅助反编译，自动识别加密算法 | 1.1k |
 
 ### 2. JS 逆向核心
-| 入口 | 用途 |
-|------|------|
-| `jsvmp-reverse` | JS VM虚拟机逆向——TikTok栈式VM(77 opcode)案例 |
-| `find-crypto-entry` | 定位加密参数生成入口 |
-| `env-patch` | JS补环境——Node.js引擎+策略分离 |
-| `ast-deobfuscation` | Babel AST分层定向反混淆 |
-| `algorithm-reverse` | JS逆向算法还原——签名/混合加密 |
-| `anti-debug` | JS反调试对抗 + 二进制反调试 |
-| **kuizuo/js-deobfuscator** | 自动化 JS 反混淆（Babel AST） |
+| 入口 | 用途 | 关键工具 |
+|------|------|---------|
+| `jsvmp-reverse` | JS VM虚拟机逆向——TikTok栈式VM(77 opcode)案例 | — |
+| `find-crypto-entry` | 定位加密参数生成入口 | Chrome DevTools MCP |
+| `env-patch` | JS补环境——Node.js引擎+策略分离 | jsdom, Playwright |
+| `ast-deobfuscation` | Babel AST分层定向反混淆 | Babel, js-beautify |
+| `algorithm-reverse` | JS逆向算法还原——签名/混合加密 | Python Crypto |
+| `anti-debug` | JS反调试对抗 + 二进制反调试 | — |
+| **kuizuo/js-deobfuscator** | 自动化 JS 反混淆（Babel AST） | — |
 
 ### 3. 反调试对抗
 | 入口 | 用途 |
@@ -58,17 +60,24 @@ metadata:
 | `har-to-proxy-script` | HAR抓包→代理脚本 |
 | **YangChengTeam/wxappUnpacker** | 微信小程序反编译（wxapkg 还原源码） |
 
-**Cloudflare 绕过矩阵：**
+**Cloudflare 绕过矩阵 (2026 更新)：**
 
-| 等级 | 防护 | 绕过 | 实测 |
-|------|------|------|------|
+| 等级 | 防护 | 工具链 | 实测 |
+|------|------|--------|------|
 | L0 无防护 | 直接返回 | 任意 HTTP 库 | ✅ |
 | L1 IUAM | "Just a moment..." | cloudscraper / curl_cffi / FlareSolverr | ✅ |
 | L2 JS Challenge | `/cdn-cgi/challenge-platform/` | FlareSolverr / Playwright+stealth | ✅ |
-| **L3 Turnstile + JS** | 双重验证 | ❌ 需住宅代理 | ❌ |
-| L4 WAF + 指纹 | 完整检测链 | 反检测浏览器 + 住宅代理 | ❌ |
+| **L3 Turnstile + JS** | 双重验证 | **SeleniumBase UC+CDP** / **Pydoll** / **Scrapling StealthyFetcher** / 住宅代理 | ✅ |
+| L4 WAF + 指纹 | 完整检测链 | 反检测浏览器 + 住宅代理 | ⚠️ 部分 |
 
-> 无住宅代理时 L3 不可破。优先找无 CF 子域名或中转缓存。
+**新一代 CF 绕过工具 (2026)：**
+
+| 工具 | 特点 | 适用场景 |
+|------|------|---------|
+| **SeleniumBase** | UC Mode + CDP Mode + `sb.solve_captcha()` | 一键绕过，最推荐 |
+| **Pydoll** | 异步原生、零 WebDriver、内置 Turnstile 处理 | 高性能异步 |
+| **Scrapling** | 自适应解析 + MCP Server + StealthyFetcher | 大规模爬取+AI集成 |
+| **Esonhugh/pydoll-cf-waf-bypasser-skills** | Pydoll Claude Code 插件，8个模板 | Claude Code 集成 |
 
 ### 7. PyInstaller 逆向
 | 入口 | 用途 |
@@ -89,7 +98,7 @@ metadata:
 | `api-key-hunter` | 多源多厂商 Key 泄露扫描器 |
 
 ### 10. 二进制仿真
-| 工具 | 用途 |
+| 工具 | 说明 |
 |------|------|
 | **qilingframework/qiling** | 可插桩二进制仿真框架（Unicorn底层） |
 | **unicorn-engine/unicorn** | CPU 模拟器，指令级调试任意架构 |
@@ -143,3 +152,12 @@ strings识别 → pyinstxtractor解包 → pycdc反编译 → 提取API key/逻�
 ```
 binary-diffing → 定位修改函数 → 分析修改内容
 ```
+
+### CF 绕过 (2026 推荐)
+```
+轻量: curl_cffi (chrome131 指纹) → 不行则
+中量: SeleniumBase UC+CDP Mode → sb.solve_captcha() → 不行则
+重量: Pydoll async + Turnstile solver / Scrapling StealthyFetcher → 不行则
+最后: 住宅代理 + 反检测浏览器 (BrightData/IPRoyal)
+```
+
