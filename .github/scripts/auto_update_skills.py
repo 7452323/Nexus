@@ -69,12 +69,6 @@ REVERSE_QUERIES = [
     "bypass cloudflare 5 seconds",
 ]
 
-# 排序方式
-SORT_BY = {
-    "stars": "stars",           # 按 Stars
-    "updated": "updated",       # 按最后更新时间
-}
-
 HEADERS = {
     "Accept": "application/vnd.github.v3+json",
 }
@@ -215,25 +209,10 @@ def main():
     
     all_repos = []
     
-    # 按 Stars 搜索
+    # 按 Stars 搜索（唯一排序方式，减少 API 调用）
     print("[*] 按 Stars 排序搜索...")
     for query in DECRYPT_QUERIES + REVERSE_QUERIES:
         items = search_github(query, sort="stars", per_page=5)
-        for item in items:
-            repo_info = {
-                "owner": item["owner"]["login"],
-                "name": item["name"],
-                "url": item["html_url"],
-                "stars": item["stargazers_count"],
-                "updated": item.get("updated_at", "")[:10],
-                "desc": (item.get("description") or "")[:200],
-            }
-            all_repos.append(repo_info)
-    
-    # 按更新时间搜索
-    print("[*] 按更新时间排序搜索...")
-    for query in REVERSE_QUERIES:
-        items = search_github(query, sort="updated", per_page=3)
         for item in items:
             repo_info = {
                 "owner": item["owner"]["login"],
