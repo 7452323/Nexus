@@ -1,73 +1,90 @@
 ---
 name: reverse-engineering-index
-description: 逆向工程技能树索引。覆盖AI驱动逆向、JS逆向、反调试对抗、桌面/移动端逆向、Web API逆向、PyInstaller逆向、VM/字节码逆向、代码混淆、二进制逆向、协议逆向、二进制仿真、恶意软件分析13大子领域。
-category: reverse-engineering
+description: 逆向工程技能树索引 (2026.07)。覆盖AI驱动逆向、JS逆向、反调试对抗、桌面/移动端逆向、Web API协议逆向、PyInstaller逆向、VM/字节码逆向、代码混淆、二进制逆向、协议逆向、二进制仿真、恶意软件分析13大子领域。
+metadata:
+  display_name: "🔧 逆向工程技能树"
+  intent_patterns: "逆向,反编译,脱壳,JS逆向,反调试,Frida,Ghidra,IDA,解混淆,二进制,协议逆向,签名还原,补环境,AST,Unicorn,Android逆向,iOS逆向,小程序逆向,Cloudflare绕过,SeleniumBase,Pydoll,Scrapling,playwright-captcha,JSReverser-MCP"
 ---
 
-# 🔧 逆向工程技能树
+# 🔧 逆向工程技能树 (2026.07)
 
-## 领域总览
+> 逆向是你最关键的。所有逆向任务优先投入资源，持续进化。
 
-逆向工程 = 从编译产物还原逻辑。本技能树覆盖从 Web JS 到 Native SO、从二进制到协议的全栈逆向场景。
-
-**环境**: iSH Alpine Linux aarch64 — 优先浏览器取证 + Python/Node 本地复现。
-
----
+逆向工程 = 从编译产物还原逻辑。覆盖 Web JS 到 Native SO、二进制到协议的全栈逆向场景。
 
 ## 📂 子领域索引
 
 ### 1. AI 驱动逆向 (NEW 2026)
-| 工具 | 用途 | Stars |
-|------|------|-------|
-| **LaurieWired/GhidraMCP** | Ghidra MCP 服务器，LLM 自动反编译/分析/重命名 | 3.2k |
-| **bethington/ghidra-mcp** | 245 个工具，支持 P-code 模拟 | 245 |
-| **semba/llm-reverse** | LLM 辅助反编译，自动识别加密算法 | 1.1k |
-| **abstract-state/symbolic-execution-mcp** | 符号执行 MCP | new |
+| 工具 | Stars | 用途 |
+|------|-------|------|
+| **LaurieWired/GhidraMCP** | 3.2k⭐ | Ghidra MCP，LLM 自动反编译/重命名 |
+| **bethington/ghidra-mcp** | 245⭐ | 245 工具，P-code 模拟 |
+| **0xflux/ghidra-mcp** | — | Ghidra MCP 变体 |
+| **wellingtonlee/ghidra-docker-mcp** | — | Ghidra Docker MCP |
+| **cgtudor/reverse-engineering-assistant** | — | AI 逆向助手 |
+| **NoOne-hub/JSReverser-MCP** | 899⭐ | JS 逆向全流程 MCP (110 工具) |
+| **715494637/reverse-skill** | 283⭐ | Web JS 逆向 + 壳层恢复 |
 
 ### 2. JS 逆向核心
 | 入口 | 用途 | 关键工具 |
 |------|------|---------|
-| `jsvmp-reverse` | JS VM虚拟机逆向——TikTok栈式VM(77 opcode)案例 | — |
+| `jsvmp-reverse` | JS VM虚拟机逆向 | — |
 | `find-crypto-entry` | 定位加密参数生成入口 | Chrome DevTools MCP |
-| `env-patch` | JS补环境——Node.js引擎+策略分离 | jsdom, Playwright |
+| `env-patch` | JS补环境 | jsdom, Playwright |
 | `ast-deobfuscation` | Babel AST分层定向反混淆 | Babel, js-beautify |
-| `algorithm-reverse` | JS逆向算法还原——签名/混合加密 | Python Crypto |
-| `anti-debug` | JS反调试对抗 + 二进制反调试 | — |
-| **kuizuo/js-deobfuscator** | 自动化 JS 反混淆（Babel AST） | — |
+| `algorithm-reverse` | JS逆向算法还原 | Python Crypto |
+| `anti-debug` | JS反调试对抗 | — |
+| **kuizuo/js-deobfuscator** | 自动化 JS 反混淆 | — |
 
 ### 3. 反调试对抗
 | 入口 | 用途 |
 |------|------|
-| `anti-debug` | JS反调试 + 二进制反调试——4类JS反调试绕过+Linux/Win原生反调试、反VM、反DBI |
+| `anti-debug` | JS反调试 + 二进制反调试 |
 | `anti-debugging-techniques` | 反调试检测+绕过通用playbook |
 
 ### 4. 桌面/移动端逆向
 | 入口 | 用途 |
 |------|------|
-| `desktop-app-reverse` | 桌面应用逆向——Electron/Wails/Tauri/PyInstaller |
-| `android-reverse` | Android逆向——APK反编译/Frida |
-| `ida-reverse-analysis` | IDA Pro + Ghidra 二进制分析 |
+| `desktop-app-reverse` | Electron/Wails/Tauri/PyInstaller |
+| `android-reverse` | APK反编译/Frida (jadx v1.5.6) |
+| `ios-reverse` | Swift/ObjC/Frida/SSL Pinning |
+| `ida-reverse-analysis` | IDA Pro + Ghidra |
 
-### 5. iOS 逆向
+### 5. Android 逆向 (AI 增强)
+| 工具 | Stars | 用途 |
+|------|-------|------|
+| **skylot/jadx** | 49.7k⭐ | APK-Java反编译 (v1.5.6, 2026-07) |
+| **SimoneAvogadro/android-reverse-engineering-skill** | 6.4k⭐ | Claude Code 技能，自动反编译+API提取 |
+| **ReverserID/JURIG** | — | AI-agentic RE 框架 (Go, TUI) |
+| **incogbyte/android-reverse-engineering-claude-skill** | 86⭐ | AAB/APK/XAPK 反编译 + Frida 动态分析 |
+
+### 6. iOS 逆向
 | 工具 | 用途 |
 |------|------|
-| **httptoolkit/frida-interception-and-unpinning** | Frida 全自动 HTTPS MITM + SSL pinning 绕过 |
+| **sensepost/objection** (9.2k⭐) | 运行时移动探索 |
+| **httptoolkit/frida-interception-and-unpinning** | HTTPS MITM + SSL pinning |
+| **pritessh/iOS-SSL-Pinning-Bypass** | iOS 17.x SSL Pinning 5层绕过 |
 | **v-y-archive/Jailbreak-detection** | 越狱检测绕过 |
-| OWASP MASTG Frida Gadget | 非越狱 Frida Gadget 注入 |
 
-### 6. Web API 协议逆向 + Cloudflare 绕过
+### 7. Web API 协议逆向 + Cloudflare 绕过
+| 入口 | 用途 |
+|------|------|
+| `web-api-protocol-reverse` | ChatGPT/OpenAI等接口 |
+| `har-to-proxy-script` | HAR抓包→代理脚本 |
 
-**CF 绕过工具链 (2026)：**
+**CF 绕过工具链 (2026.07)：**
 
 | 工具 | 特点 | 推荐等级 |
 |------|------|---------|
 | **SeleniumBase** | UC Mode + CDP Mode + solve_captcha() | ⭐⭐⭐⭐⭐ |
-| **Pydoll** | 异步原生、零 WebDriver、内置 Turnstile | ⭐⭐⭐⭐⭐ |
-| **Scrapling** | 自适应解析 + MCP Server + StealthyFetcher | ⭐⭐⭐⭐ |
-| **Esonhugh/pydoll-cf-waf-bypasser-skills** | Pydoll Claude Code 插件，8模板 | ⭐⭐⭐⭐ |
+| **Pydoll** | 异步原生、零 WebDriver | ⭐⭐⭐⭐⭐ |
+| **Scrapling** | 自适应解析 + MCP Server | ⭐⭐⭐⭐ |
+| **playwright-captcha** | ClickSolver + 2CaptchaSolver | ⭐⭐⭐⭐ |
+| **Esonhugh/pydoll-cf-waf-bypasser-skills** | Pydoll Claude Code 插件 (209⭐) | ⭐⭐⭐⭐ |
+| **1837620622/cloudflare-bypass-2026** | 5策略整合 (401⭐) | ⭐⭐⭐⭐ |
 | **curl_cffi** | TLS 指纹伪装 | ⭐⭐⭐ (仅L1) |
 | **cloudscraper** | 基础 IUAM 绕过 | ⭐⭐ (仅L1) |
-| **FlareSolverr** | 独立服务部署 | ⭐⭐⭐ (L1-L3) |
+| **FlareSolverr** | 独立 CF 绕过服务 | ⭐⭐⭐ (L1-L3) |
 
 **CF 防护等级：**
 
@@ -76,64 +93,67 @@ category: reverse-engineering
 | L0 | 无 | requests |
 | L1 | IUAM | curl_cffi / cloudscraper |
 | L2 | JS Challenge | FlareSolverr / Playwright+stealth |
-| L3 | Turnstile + JS | **SeleniumBase** / **Pydoll** / **Scrapling** |
+| L3 | Turnstile + JS | **SeleniumBase** / **Pydoll** / **Scrapling** / **playwright-captcha** |
 | L4 | WAF + 指纹 | 反检测浏览器 + 住宅代理 |
 
-### 7. PyInstaller 逆向
+### 8. JS 逆向 MCP 生态
+| MCP Server | Stars | 用途 |
+|------------|-------|------|
+| **NoOne-hub/JSReverser-MCP** | 899⭐ | JS 逆向全流程 (110 工具, 3 模式) |
+| **lwjjike/JSReverser-Strong-MCP** | 61⭐ | JSReverser 增强版 |
+| **zhizhuodemao/js-reverse-mcp** | — | AI Agent 设计 + 反检测 |
+| **a0yark/js-reverse-mcp** | — | Patchright stealth + JSReverser |
+| **ChromeDevTools/chrome-devtools-mcp** | — | Google 官方 CDP MCP |
+
+### 9. PyInstaller 逆向
 | 入口 | 用途 |
 |------|------|
 | `pyinstaller-reverse` | pyinstxtractor+pycdc 全流程 |
 
-### 8. 代码混淆/反混淆
+### 10. 代码混淆/反混淆
 | 入口 | 用途 |
 |------|------|
-| `deobfuscator` | JS反混淆——jsjiami/sojson/obfuscator.io |
+| `deobfuscator` | jsjiami/sojson/obfuscator.io |
 | `ast-deobfuscation` | Babel AST反混淆 |
 | **Owl4444/jsdeob-workbench** | 可视化反混淆工作台 |
 | **mandiant/flare-floss** | 二进制混淆字符串自动提取 |
 
-### 9. 二进制仿真
+### 11. 二进制 Diffing
+| 工具 | 用途 |
+|------|------|
+| **quarkslab/qbindiff** | Quarkslab 二进制 Diffing |
+| **google/bindiff** | Google 二进制 Diffing |
+| **joxeankoret/diaphora** | 开源二进制 Diffing |
+
+### 12. 二进制仿真
 | 工具 | 说明 |
 |------|------|
-| **qilingframework/qiling** | 可插桩二进制仿真框架（Unicorn底层） |
-| **unicorn-engine/unicorn** | CPU 模拟器，指令级调试任意架构 |
+| **qilingframework/qiling** | 可插桩二进制仿真框架 |
+| **unicorn-engine/unicorn** | CPU 模拟器 |
 
-### 10. 其他
+### 13. 协议逆向
+| 工具 | 用途 |
+|------|------|
+| **patrickomatic/protorev** | 协议逆向 |
+| **yeet-src/grpcsnoop** | gRPC 协议分析 |
+
+### 14. 其他
 | 入口 | 用途 |
 |------|------|
 | `binary-diffing` | 二进制Diffing+补丁分析 |
-| `book-source-master` | Legado阅读3.0书源编写 |
+| `book-source-master** | Legado阅读3.0书源编写 |
 | `qx-script-master` | Quantumult X/Surge脚本 |
 
----
+## 🔀 典型工作流
 
-## 🔀 跨领域关联
-
-- **JS逆向 + 反调试**：env-patch 和 anti-debug 常配合使用——先绕反调试，再补环境
-- **JS逆向 + Web API逆向**：find-crypto-entry 定位入口 → web-api-reverse-engineering 构建协议
-- **桌面逆向 + SO分析**：desktop-app-unlock 可能需要 so-native-analysis 分析底层 .so
-- **VM逆向 + AST反混淆**：jsvmp-reverse 还原VMP时常需 ast-deobfuscation 预处理
-- **二进制逆向 + 协议逆向**：先用protocol-re逆向协议格式，再用binary-diffing对比协议变化
-- **Android逆向 + SO分析**：android-reverse-engineering 分析Java层，so-native-analysis分析Native层
-- **AI + 逆向**：GhidraMCP + LLM 自动反编译，效率提升10倍
-
----
-
-## 📖 典型工作流
-
-### Web JS 逆向全流程
+### Web JS 逆向
 ```
-anti-debug（绕反调试）→ find-crypto-entry（定位入口）→ env-patch（补环境）
-→ ast-deobfuscation（反混淆）→ algorithm-reverse（还原算法）
-→ web-api-to-openai-proxy（构建代理）
+anti-debug → find-crypto-entry → env-patch → ast-deobfuscation → algorithm-reverse
 ```
 
 ### CF 绕过 (2026 推荐)
 ```
-轻量: curl_cffi (chrome131 指纹) → 不行则
-中量: SeleniumBase UC+CDP Mode → sb.solve_captcha() → 不行则
-重量: Pydoll async + Turnstile solver / Scrapling StealthyFetcher → 不行则
-最后: 住宅代理 + 反检测浏览器 (BrightData/IPRoyal)
+轻量: curl_cffi → 中量: SeleniumBase UC+CDP → sb.solve_captcha() → 重量: Pydoll/Scrapling/playwright-captcha → 最后: 住宅代理
 ```
 
 ### AI 驱动二进制逆向
@@ -141,60 +161,18 @@ anti-debug（绕反调试）→ find-crypto-entry（定位入口）→ env-patch
 GhidraMCP → 自动反编译 → LLM分析函数 → 自动重命名 → 提取协议/算法
 ```
 
-### 移动端逆向全流程
+### Android 逆向 (AI 增强)
 ```
-android-reverse-engineering（APK反编译）→ so-native-analysis（SO分析）
-→ ida-reverse-analysis（IDA深入）→ reverse-engineering-general（Frida Hook）
-```
-
-### VMP 逆向全流程
-```
-anti-debug（绕反调试）→ ast-deobfuscation（预处理）→ jsvmp-reverse（VMP还原）
-→ algorithm-reverse（算法提取）
+指纹识别 (fingerprint.sh) → jadx 反编译 → API 提取 → Frida 动态分析 → 自动生成 bypass 脚本
 ```
 
-### 1-day漏洞研究全流程
+### iOS 逆向
 ```
-binary-diffing（对比新旧版本）→ 定位修改函数 → 分析修改内容 → 还原漏洞
-```
-
-### 协议逆向全流程
-```
-protocol-reverse-engineering（抓包+分析）→ 识别消息格式 → 推断状态机
-→ web-api-reverse-engineering（构建自动化）
+Objection → Frida universal script → SSL Kill Switch 2 → IPA Patching → Data layer hook
 ```
 
----
-
-## 🗄️ 知识库
-
-### 工具可用性清单（iSH 环境）
-
-| 场景 | 可用工具 | 不可用 |
-|------|---------|--------|
-| 页面取证 | ✅ Minis 浏览器 | — |
-| JS 拦截 | ✅ execute_js | — |
-| Cookie 提取 | ✅ get_cookies | — |
-| 本地复现 | ✅ Python3 / Node.js | — |
-| HTTP 请求 | ✅ curl / wget | — |
-| 加解密 | ✅ openssl / Python crypto | — |
-| CF 绕过 | ✅ Minis 浏览器 / SeleniumBase / Pydoll / Scrapling | — |
-| 二进制分析 | ❌ 无 IDA/Ghidra | 在线沙箱 |
-| APK 分析 | ❌ 无 jadx/JDK | 在线反编译 |
-| 动态 Hook | ❌ 无 Frida | 浏览器 CDP |
-
-### 推荐工具链
-
-| 场景 | 推荐 |
-|------|------|
-| CF L1 绕过 | curl_cffi / cloudscraper |
-| CF L2 绕过 | FlareSolverr |
-| CF L3 Turnstile | SeleniumBase / Pydoll / Scrapling |
-| CF L4 全指纹 | 住宅代理 + 反检测浏览器 |
-| JS 反混淆 | Babel AST / kuizuo/js-deobfuscator |
-| JS 补环境 | Node.js + jsdom |
-| 二进制分析 | Ghidra + GhidraMCP |
-| 符号执行 | angr / Triton |
-| 二进制仿真 | Qiling / Unicorn |
-| 协议逆向 | protobuf-inspector / netzob |
+### 1-day漏洞研究
+```
+binary-diffing → 定位修改函数 → 分析修改内容
+```
 
