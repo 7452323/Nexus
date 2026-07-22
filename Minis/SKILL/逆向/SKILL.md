@@ -176,3 +176,18 @@ Objection → Frida universal script → SSL Kill Switch 2 → IPA Patching → 
 binary-diffing → 定位修改函数 → 分析修改内容
 ```
 
+
+
+<!-- 自动发现 2026-07-23 -->
+## 自动发现的新工具
+
+| 仓库 | Stars | 描述 |
+|------|-------|------|
+| [iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool) | 25081⭐ | A tool for reverse engineering Android apk files |
+| [OWASP/mastg](https://github.com/OWASP/mastg) | 13078⭐ | The OWASP Mobile Application Security Testing Guide (MASTG) is a comprehensive m |
+| [dsasmblr/game-hacking](https://github.com/dsasmblr/game-hacking) | 5532⭐ | Tutorials, tools, and more as related to reverse engineering video games. |
+| [alphaSeclab/awesome-reverse-engineering](https://github.com/alphaSeclab/awesome-reverse-engineering) | 5002⭐ | Reverse Engineering Resources About All Platforms(Windows/Linux/macOS/Android/iO |
+| [JonathanSalwan/Triton](https://github.com/JonathanSalwan/Triton) | 4240⭐ | Triton is a dynamic binary analysis library. Build your own program analysis too |
+| [GDRETools/gdsdecomp](https://github.com/GDRETools/gdsdecomp) | 3911⭐ | Godot reverse engineering tools |
+| [NAalytics/Assemblies-of-putative-SARS-CoV2-spike-encoding-mRNA-sequences-for-vaccines-BNT-162b2-and-mRNA-1273](https://github.com/NAalytics/Assemblies-of-putative-SARS-CoV2-spike-encoding-mRNA-sequences-for-vaccines-BNT-162b2-and-mRNA-1273) | 3354⭐ | RNA vaccines have become a key tool in moving forward through the challenges rai |
+| [j4k0xb/webcrack](https://github.com/j4k0xb/webcrack) | 2805⭐ | Deobfuscate obfuscator.io, unminify and unpack bundled javascript |
