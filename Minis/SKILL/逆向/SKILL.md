@@ -178,38 +178,3 @@ binary-diffing → 定位修改函数 → 分析修改内容
 
 
 
-<!-- 自动发现 2026-07-23 -->
-## 自动发现的新工具
-
-| 仓库 | Stars | 描述 |
-|------|-------|------|
-| [iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool) | 25081⭐ | A tool for reverse engineering Android apk files |
-| [OWASP/mastg](https://github.com/OWASP/mastg) | 13078⭐ | The OWASP Mobile Application Security Testing Guide (MASTG) is a comprehensive m |
-| [dsasmblr/game-hacking](https://github.com/dsasmblr/game-hacking) | 5532⭐ | Tutorials, tools, and more as related to reverse engineering video games. |
-| [alphaSeclab/awesome-reverse-engineering](https://github.com/alphaSeclab/awesome-reverse-engineering) | 5002⭐ | Reverse Engineering Resources About All Platforms(Windows/Linux/macOS/Android/iO |
-| [JonathanSalwan/Triton](https://github.com/JonathanSalwan/Triton) | 4240⭐ | Triton is a dynamic binary analysis library. Build your own program analysis too |
-| [GDRETools/gdsdecomp](https://github.com/GDRETools/gdsdecomp) | 3911⭐ | Godot reverse engineering tools |
-| [NAalytics/Assemblies-of-putative-SARS-CoV2-spike-encoding-mRNA-sequences-for-vaccines-BNT-162b2-and-mRNA-1273](https://github.com/NAalytics/Assemblies-of-putative-SARS-CoV2-spike-encoding-mRNA-sequences-for-vaccines-BNT-162b2-and-mRNA-1273) | 3354⭐ | RNA vaccines have become a key tool in moving forward through the challenges rai |
-| [j4k0xb/webcrack](https://github.com/j4k0xb/webcrack) | 2805⭐ | Deobfuscate obfuscator.io, unminify and unpack bundled javascript |
-
-
-<!-- 自动发现 2026-07-22 -->
-## 自动发现的新工具
-
-| 仓库 | Stars | 最近更新 | 描述 |
-|------|-------|---------|------|
-| [x64dbg/x64dbg](https://github.com/x64dbg/x64dbg) | 48966⭐ | 2026-07-22 | An open-source user mode debugger for Windows. Optimized for |
-| [CloakHQ/CloakBrowser](https://github.com/CloakHQ/CloakBrowser) | 28925⭐ | 2026-07-22 | Stealth Chromium that passes every bot detection test. Drop- |
-| [MatrixTM/MHDDoS](https://github.com/MatrixTM/MHDDoS) | 16437⭐ | 2026-07-22 | Best DDoS Attack Script  Python3, (Cyber / DDos) Attack With |
-| [FlareSolverr/FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) | 14837⭐ | 2026-07-22 | Proxy server to bypass Cloudflare protection |
-| [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase) | 12890⭐ | 2026-07-22 | 📊 APIs for web automation, testing, and bypassing bot-detect |
-| [jo-inc/camofox-browser](https://github.com/jo-inc/camofox-browser) | 7936⭐ | 2026-07-22 | Stealth headless browser for AI agents — bypass Cloudflare,  |
-| [berstend/puppeteer-extra](https://github.com/berstend/puppeteer-extra) | 7384⭐ | 2026-07-22 | 💯  Teach puppeteer new tricks through plugins. |
-| [autoscrape-labs/pydoll](https://github.com/autoscrape-labs/pydoll) | 6964⭐ | 2026-07-22 | Pydoll is a library for automating chromium-based browsers w |
-| [VeNoMouS/cloudscraper](https://github.com/VeNoMouS/cloudscraper) | 6659⭐ | 2026-07-21 | A Python module to bypass Cloudflare's anti-bot page. |
-| [CreditTone/hooker](https://github.com/CreditTone/hooker) | 5247⭐ | 2026-07-22 | 🔥🔥 hooker is a Frida-based reverse engineering toolkit for A |
-| [denuitt1/mhr-cfw](https://github.com/denuitt1/mhr-cfw) | 4412⭐ | 2026-07-22 | A Domain-Fronting Relay that routes traffic though GAS (Goog |
-| [x64dbg/ScyllaHide](https://github.com/x64dbg/ScyllaHide) | 4232⭐ | 2026-07-22 | Advanced usermode anti-anti-debugger. Forked from https://bi |
-| [alexandreborges/malwoverview](https://github.com/alexandreborges/malwoverview) | 3949⭐ | 2026-07-21 | Malwoverview is a first response tool for threat hunting acr |
-| [a0rtega/pafish](https://github.com/a0rtega/pafish) | 3943⭐ | 2026-07-21 | Pafish is a testing tool that uses different techniques to d |
-| [decalage2/oletools](https://github.com/decalage2/oletools) | 3386⭐ | 2026-07-22 | oletools - python tools to analyze MS OLE2 files (Structured |
