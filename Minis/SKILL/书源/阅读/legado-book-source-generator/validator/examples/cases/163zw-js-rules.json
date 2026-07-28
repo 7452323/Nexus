@@ -1,0 +1,15 @@
+{
+  "name": "163zw (163中文网) — @css:selector@attr 格式",
+  "category": "js-rules",
+  "sourceFile": "163zw-com.json",
+  "sourceUrl": "https://www.163zw.com",
+  "keyword": "凡人修仙传",
+  "mode": "http",
+  "expected": {
+    "search": {
+      "status": "error",
+      "note": "已知限制：@css:selector@attr 格式未被 validator 解析器正确处理"
+    }
+  },
+  "note": "书源用 @css:dt a@href 格式，validator 的 CSS 解析器将 @href 误当属性名。需 Phase 3+ 修复 AnalyzeByJSoup 的 @css: 规则解析。"
+}
