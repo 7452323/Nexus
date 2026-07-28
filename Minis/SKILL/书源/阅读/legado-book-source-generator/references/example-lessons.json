@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "lessons": [
+    {
+      "lessonId": "partial-chain-success-is-not-full-pass",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["search_blocked", "detail_success", "toc_success", "content_success"],
+      "checkQuestions": [
+        "搜索链路是否独立验证成功？",
+        "是否存在已验证的替代入口？",
+        "是否把详情/目录/正文成功误写成整体 full pass？"
+      ],
+      "notEvidence": ["historical selector", "historical URL", "historical site behavior"]
+    },
+    {
+      "lessonId": "desktop-cookie-is-not-mobile-webview-cookie",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["login_cookie", "android_probe"],
+      "checkQuestions": [
+        "登录态是否来自当前验证环境？",
+        "validator 请求里是否真的有 Cookie/Authorization？",
+        "是否把桌面浏览器登录当成手机 WebView 登录？"
+      ],
+      "notEvidence": ["browser logged-in UI", "manual login claim"]
+    },
+    {
+      "lessonId": "ssr-content-does-not-prove-discovery",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["content_ssr", "search_unknown"],
+      "checkQuestions": [
+        "正文 SSR 是否只证明 content 链路？",
+        "搜索/书库/发现是否单独验证？",
+        "是否把正文 HTML 可见误写成全站无反爬？"
+      ],
+      "notEvidence": ["content page html", "single direct chapter url"]
+    },
+    {
+      "lessonId": "exploreurl-must-be-json-array-string",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["exploreUrl", "enabledExplore", "discovery_page"],
+      "checkQuestions": [
+        "exploreUrl 是否是 JSON 数组字符串？",
+        "每个元素是否包含 title、url（含 {{page}}）、style 字段？",
+        "是否错误使用了换行分隔的 URL 字符串？"
+      ],
+      "notEvidence": ["newline-separated urls", "single url string"]
+    },
+    {
+      "lessonId": "coverurl-needs-jslib-for-constructed-urls",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["coverUrl", "cover_image", "jsLib"],
+      "checkQuestions": [
+        "搜索结果是否有 img 标签？",
+        "封面 URL 是否需要从书籍 URL 拼接？",
+        "是否正确定义了 jsLib 中的 cover() 函数？",
+        "不同页面（首页、详情页、搜索页）封面域名和路径是否不同？"
+      ],
+      "notEvidence": ["assumed same domain", "single page cover extraction"]
+    },
+    {
+      "lessonId": "content-pagination-needs-nextcontenturl",
+      "source": "examples",
+      "confidence": "heuristic",
+      "triggerTags": ["nextContentUrl", "content_pagination", "chapter_pages"],
+      "checkQuestions": [
+        "正文页是否有"下一页"链接？",
+        "是否添加了 nextContentUrl 规则？",
+        "是否清理了"本章未完"等提示文字？",
+        "nextContentUrl 是否使用了 CSS 选择器而非变量引用？"
+      ],
+      "notEvidence": ["single page content", "no pagination link found"]
+    }
+  ]
+}
