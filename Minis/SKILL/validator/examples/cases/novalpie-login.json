@@ -1,0 +1,35 @@
+{
+  "name": "novalpie — 登录态验收",
+  "category": "login-required",
+  "sourceFile": "novalpie-com.json",
+  "sourceUrl": "https://novalpie.cc",
+  "keyword": "凡人修仙传",
+  "mode": "http",
+  "expected": {
+    "search": {
+      "status": "success"
+    },
+    "detail": {
+      "status": "success"
+    },
+    "toc": {
+      "status": "success"
+    },
+    "content": {
+      "status": "error",
+      "note": "HTTP 匿名模式预期停在 WebView/登录态边界；登录态正文需 Android Probe 或 App 手动复核"
+    }
+  },
+  "note": "novalpie 是登录态 + WebView 回归源。自动 case 只验证匿名结构链路和正文边界，登录态 passed 才能标可用。手动测试流程见 manualTest 字段。",
+  "manualTest": {
+    "description": "novalpie 需要登录态验证",
+    "steps": [
+      "1. 启动 validator",
+      "2. 匿名跑 /api/debug/run → 预期 finalStatus=anonymous_candidate",
+      "3. 获取登录 Cookie（Browser MCP 或手动登录）",
+      "4. POST /api/cookie/set 注入 Cookie",
+      "5. 再跑 /api/debug/run → 预期 finalStatus=passed + sessionMode=authenticated",
+      "6. 检查 content 不为空、不是登录墙、不是串章"
+    ]
+  }
+}
