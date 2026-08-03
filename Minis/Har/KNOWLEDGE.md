@@ -224,7 +224,67 @@ for (let item of $.userCookie) {
 | 计划任务 | `[task_local]` | `cron` | `cron` |
 | 去广告域名 | `hostname, reject` | `DOMAIN, h, REJECT` | `DOMAIN, h, REJECT` |
 
-## 六、已深读仓库清单
+- [主机名]
+hostname = {hostnames}
+
+## 六、本轮新发现模式 (v3-final)
+
+### 模式13: script-request-body 请求体修改
+```
+^url$ url script-request-body script.js
+```
+**场景**: 绕过扣费/修改购买数据 (Guding88 qinaidebingxiang.js)
+```js
+var obj = JSON.parse($request.body);
+obj.coin = 0;  // 绕过扣费
+$done({body: JSON.stringify(obj)});
+```
+
+### 模式14: script-response-header 响应头修改
+```
+^url$ url script-response-header script.js
+```
+**场景**: RevenueCat double-hook (thebestkyle323 系列)
+```js
+const headers = $response.headers;
+$done({headers});
+```
+
+### 模式15: 单脚本多URL处理
+```js
+if ($request.url.includes("/vip")) {
+    // 响应体修改
+} else if ($request.url.includes("/unlock")) {
+    // 请求体修改
+}
+// 一个.js处理多个不同API端点
+```
+
+### 模式16: QX conf 直接修改请求token
+```
+^url$ url request-body sign_token=OLD request-body sign_token=NEW
+```
+**场景**: 动态签名替换 (gjwj666 milk.js conf)
+
+### 模式17: MD5签名计算 (签到脚本)
+```js
+// shengetui 多仓库: bwcj.js, gd.js, jhsh_checkIn.js
+var sign = MD5(body + timestamp + salt);
+```
+**用途**: 签到脚本需要计算动态签名
+
+### 模式18: 组合混淆 (triple-jsjiami + eval packer)
+```
+RC4解密 → Base64 → eval(pack) → 实际代码
+```
+**代表**: thebestkyle323 AppBlocker.js / BoyMath.js
+
+### 模式19: chxm1023 多规则一条龙
+一个 HAR 文件 10+ 个 rewrite 规则，覆盖：
+- VIP信息 → 广告tab → 商场广告 → 广告列表 → 软件更新 → 播放限制
+**示例**: rrtv_json.js (人人视频完整去广告+爆破)
+
+## 七、已深读仓库清单 (最终总计: 58个)
 
 ### QX/Surge/Loon (30/46)
 NobyDa/Script, Guding88/Script, Crazy-Z7/Script, Orz-3/QuantumultX, ddgksf2013, blackmatrix7/ios_rule_script, Hackl0us/SS-Rule-Snippet, Hackl0us/GeoIP2-CN, I-am-R-E/Functional-Store-Hub, chxm1023/Advertising, gjwj666/qx, xiaomaoJT/QxScript, shengetui/qx, fyjsy/KOP-XIAO, Orz-3/mini, limbopro/Adblock4limbo, thebestkyle323/Quantumult-x, QingRex/LoonKissSurge, LOWERTOP/Shadowrocket-First, Moli-X/Tool, axcsz/Collect, mist-whisper/Surge, Rabbit-Spec/Surge, SukkaW/Surge, Yarmukhamedov/mitm, deezertidal/deezertidal, fmz200/wool_scripts, sve1r/Rules-For-Quantumult-X, wuai19/rewrite, Yu9191/Yu9191
