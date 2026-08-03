@@ -545,6 +545,8 @@ class HARAnalyzer:
             self.load_data(har_data)
     
     def load(self, path: str):
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"HAR file not found: {path}")
         with open(path, 'r', encoding='utf-8') as f:
             self.load_data(json.load(f))
     
