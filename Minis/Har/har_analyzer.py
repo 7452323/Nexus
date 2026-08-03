@@ -162,6 +162,63 @@ hostname = {hostnames}
 """,
 }
 
+# Loon 特有操作类型（从55+仓库学到的）
+LOON_OPS = {
+    "json_del": "response-body-json-del",  # 删除JSON字段 → 去广告利器
+    "json_jq": "response-body-json-jq",    # jq表达式过滤
+    "json_replace": "response-body-json-replace",  # 替换JSON子树
+    "reject_dict": "reject-dict",           # 拒绝特定请求
+    "redirect_307": "url 307",              # 307重定向(地区绕过)
+}
+
+# 307重定向模式 (fmz200 TikTok 地区绕过)
+REDIRECT_PATTERNS = {
+    "region_bypass": '(?<=_region=)CN(?=&) url 307 MO',
+    "query_strip": '^(url_pattern)(.+)(\\?)(.+) url 302 $1$3',
+}
+
+# Mock/Noop 模式 (SukkaW)
+MOCK_TEMPLATE = """(function(){{'use strict';
+const noopfn = () => {{}};
+const methods = {method_list};
+methods.forEach(a => {{ window.{target_object}.extern[a] = noopfn; }});
+}})();
+"""
+
+# 签到脚本模板
+CHECKIN_TEMPLATES = {
+    "qx": """// {app_name} 签到
+const $ = new Env('{app_name}');
+const ckName = '{ck_name}';
+
+if (typeof $request !== 'undefined') {{
+    // Cookie获取模式
+    let val = $request.headers['{header_key}'];
+    if (val) $.setdata(val, ckName);
+    $.done();
+}} else {{
+    // 签到执行模式
+    !(async () => {{
+        let cookie = $.getdata(ckName);
+        if (!cookie) return $.msg('{app_name}', '❌ Cookie not found', '');
+        $.post({{
+            url: '{sign_url}',
+            headers: {{ 'Cookie': cookie }},
+            body: '{sign_body}'
+        }}, (err, resp, data) => {{
+            $.msg('{app_name}', '', data);
+        }});
+    }})()
+    .catch(e => $.logErr(e))
+    .finally(() => $.done());
+}}
+""",
+    "boxjs": """// Boxjs JSON 变量配置
+// 变量名: {ck_name}
+// 格式: ["cookie1", "cookie2"] 或 [{{"url":"...", "method":"GET", "headers":{{"key":"value"}}}}]
+""",
+}
+
 
 # ============================================================
 # 数据模型
@@ -563,6 +620,90 @@ class HARAnalyzer:
         keywords = ['config', 'init', 'feature', 'settings', 'abtest', 'experiment']
         return [e for e in self.entries if any(kw in e.url.lower() for kw in keywords) and e.resource_type == 'json']
     
+    def find_cookie_capture_targets(self) -> List[HAREntry]:
+        """查找可用于Cookie捕获的认证请求"""
+        results = []
+        for e in self.entries:
+            headers = {**e.req_headers, **e.resp_headers}
+            for hk, hv in headers.items():
+                if any(kw in hk.lower() for kw in ['authorization', 'token', 'cookie', 'set-cookie', 'x-auth']):
+                    results.append(e)
+                    break
+        return results
+    
+    def suggest_loon_ad_del(self) -> List[Dict]:
+        """建议Loon json-del去广告字段"""
+        suggestions = []
+        for e in self.entries:
+            if e.resp_json and isinstance(e.resp_json, dict):
+                # 检测可能含广告的字段名
+                ad_keys = []
+                def _scan(obj, prefix=""):
+                    if isinstance(obj, dict):
+                        for k, v in obj.items():
+                            full = f"{prefix}.{k}" if prefix else k
+                            if any(pat in k.lower() for pat in ['ad', 'ads', 'advert', 'sponsor', 'promotion', 'banner', 'tracking']):
+                                ad_keys.append(full)
+                            if isinstance(v, (dict, list)):
+                                _scan(v, full)
+                    elif isinstance(obj, list):
+                        for i, item in enumerate(obj):
+                            if isinstance(item, (dict, list)):
+                                _scan(item, f"{prefix}[{i}]")
+                _scan(e.resp_json)
+                if ad_keys:
+                    suggestions.append({
+                        'url': e.url,
+                        'method': e.method,
+                        'hostname': e.hostname,
+                        'path': e.path,
+                        'ad_fields': ad_keys[:5],
+                        'loon_rewrite': f"^{re.escape(e.hostname)}{re.escape(e.path)}$ response-body-json-del {' '.join(ad_keys[:5])}"
+                    })
+        return suggestions
+    
+    def find_region_redirects(self) -> List[Dict]:
+        """检测可地区绕过的请求"""
+        results = []
+        for e in self.entries:
+            # 检测请求http头中有region标记
+            headers = {**e.req_headers, **e.resp_headers}
+            for hk in headers:
+                if any(kw in hk.lower() for kw in ['region', 'locale', 'accept-language']):
+                    results.append({
+                        'url': e.url,
+                        'hostname': e.hostname,
+                        'header': hk,
+                        'value': headers[hk],
+                        'suggestion': f"(?<=_region=)CN(?=&) url 307 XX"
+                    })
+                    break
+        return results
+        return results
+    
+    def generate_loon_plugin(self, entries: List[HAREntry], app_name: str = "App") -> str:
+        """生成Loon插件格式"""
+        lines = [
+            f"#!name = {app_name} 解锁",
+            f"#!desc = 自动生成 - HAR Analyzer v2",
+            f"#!date = {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "",
+            "[Rule]",
+        ]
+        # 广告域名reject
+        ad_entries = [e for e in entries if any(re.search(p, e.hostname, re.I) for p in AD_PATTERNS)]
+        for e in ad_entries[:10]:
+            lines.append(f"DOMAIN, {e.hostname}, REJECT")
+        
+        lines.extend(["", "[Rewrite]"])
+        for e in entries:
+            if e.resp_json and e.resource_type == 'json':
+                path_escaped = re.escape(e.path)
+                lines.append(f"^https://{re.escape(e.hostname)}{path_escaped}$ script-response-body")
+        
+        lines.extend(["", "[MitM]", f"hostname = {', '.join(set(e.hostname for e in entries)) if entries else '*'}"])
+        return '\n'.join(lines)
+    
     # --- 对比分析 ---
     def diff(self, other: 'HARAnalyzer') -> Dict:
         """对比两个 HAR 包差异"""
@@ -724,6 +865,9 @@ def main():
     p.add_argument('--find-ads', action='store_true', help='查找广告请求')
     p.add_argument('--find-auth', action='store_true', help='查找认证请求')
     p.add_argument('--find-config', action='store_true', help='查找配置请求')
+    p.add_argument('--find-cookies', action='store_true', help='查找Cookie/Token捕获目标')
+    p.add_argument('--suggest-loon-ad-del', action='store_true', help='建议Loon json-del去广告字段')
+    p.add_argument('--gen-loon-plugin', action='store_true', help='生成Loon插件格式')
     p.add_argument('--gen-script', action='store_true', help='生成破解脚本模板')
     p.add_argument('--diff', help='对比两个 HAR 文件 (--diff file2.har)')
     p.add_argument('--domain', help='按域名过滤')
@@ -796,6 +940,24 @@ def main():
     elif args.find_config:
         entries = a.find_config_related()
         title = "Config Related"
+    elif args.find_cookies:
+        entries = a.find_cookie_capture_targets()
+        title = "Cookie Capture Targets"
+    elif args.suggest_loon_ad_del:
+        suggestions = a.suggest_loon_ad_del()
+        print(f"\n=== Loon json-del 建议 ({len(suggestions)}) ===")
+        for s in suggestions:
+            print(f"  {s['method']} {s['hostname']}{s['path']}")
+            print(f"  广告字段: {' '.join(s['ad_fields'])}")
+            print(f"  Loon Rewrite: {s['loon_rewrite']}")
+        return
+    elif args.gen_loon_plugin:
+        entries = a.find_vip_related()
+        if entries:
+            print(a.generate_loon_plugin(entries[:args.top], args.app_name))
+        else:
+            print("No VIP-related requests found. Try using --find-vip first.")
+        return
     elif args.domain:
         entries = a.by_domain(args.domain)
         title = f"Domain: {args.domain}"
