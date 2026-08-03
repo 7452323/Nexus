@@ -1,0 +1,51 @@
+{
+  "name": "hara",
+  "version": "0.1.6",
+  "description": "A Node.js-based tool for identifying performance issues on HAR files.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinfarrugia/hara"
+  },
+  "author": {
+    "name": "Kevin Farrugia",
+    "email": "hello@imkev.dev",
+    "url": "https://github.com/kevinfarrugia"
+  },
+  "main": "./lib/main.js",
+  "bin": {
+    "hara": "./bin/hara"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "eslint --no-ignore --fix",
+      "git add --force"
+    ]
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "commander": "^7.2.0",
+    "csv-stringify": "^5.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.0",
+    "eslint-config-prettier": "^6.6.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.0.9",
+    "lint-staged": "^9.4.3",
+    "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=10.13.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}
